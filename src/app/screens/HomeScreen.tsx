@@ -78,8 +78,6 @@ export function HomeScreen() {
     fetchData();
   }, []);
 
-  // ... (keeping existing loaders and error states)
-
   // Carousel logic snippet (simple auto-slide)
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   useEffect(() => {

@@ -64,6 +64,62 @@ export function ProfileScreen() {
     return { name: tierSettings.tier_regular_name, color: tierSettings.tier_regular_color };
   };
 
+  const getTierConfig = () => {
+    const tier = getUserTier();
+    const name = tier.name.toUpperCase();
+    
+    if (name.includes('GOLD')) {
+      return {
+        cardClass: "bg-gradient-to-br from-yellow-100/90 via-amber-50/95 to-yellow-200/90 backdrop-blur-3xl border-2 border-yellow-400/40 shadow-yellow-400/20",
+        badgeClass: "bg-gradient-to-r from-yellow-500 to-amber-400 shadow-lg shadow-yellow-500/20",
+        initial: { opacity: 0, y: 20, scale: 0.9, rotateY: 5 },
+        animate: { opacity: 1, y: 0, scale: 1, rotateY: 0 },
+        transition: { type: 'spring', damping: 15, duration: 0.8 },
+        shimmerDuration: 2,
+        shimmerClass: "via-white/40",
+        orbs: [
+          { size: 'w-32 h-32', color: 'bg-yellow-400/20', position: '-top-10 -right-10' },
+          { size: 'w-24 h-24', color: 'bg-amber-300/15', position: '-bottom-8 -left-8' },
+          { size: 'w-20 h-20', color: 'bg-orange-300/10', position: 'top-1/2 right-1/4' },
+        ],
+        hover: { scale: 1.05, rotateY: -2 },
+        glow: true
+      };
+    }
+    
+    if (name.includes('SILVER')) {
+      return {
+        cardClass: "bg-gradient-to-br from-gray-100/90 via-white/95 to-gray-200/90 backdrop-blur-2xl border border-gray-300/60 shadow-gray-300/20",
+        badgeClass: "bg-gray-400 shadow-md",
+        initial: { opacity: 0, y: 20, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        transition: { duration: 0.6 },
+        shimmerDuration: 3,
+        shimmerClass: "via-white/20",
+        orbs: [
+          { size: 'w-40 h-40', color: 'bg-gray-300/20', position: '-bottom-10 -left-10' }
+        ],
+        hover: { scale: 1.03 },
+        glow: false
+      };
+    }
+    
+    return {
+      cardClass: "bg-white/80 backdrop-blur-xl border border-gray-200/50 shadow-gray-200/10",
+      badgeClass: "bg-gray-500",
+      initial: { opacity: 0, y: 20 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0.5 },
+      shimmerDuration: 0,
+      shimmerClass: "",
+      orbs: [],
+      hover: { scale: 1.02 },
+      glow: false
+    };
+  };
+
+  const tierConfig = getTierConfig();
+
   const handleLogout = async () => {
     try {
       await api.post('/logout');
@@ -103,7 +159,12 @@ export function ProfileScreen() {
           transition={{ delay: 0.2 }}
           className="relative z-10"
         >
-          <h1 className="text-white font-bold text-2xl mb-6">Profil</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-white font-bold text-2xl">Profil</h1>
+            <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white ${tierConfig.badgeClass}`}>
+              {getUserTier().name} member
+            </div>
+          </div>
 
           {/* Profile Info */}
           <div className="flex items-center gap-4 mb-6">
@@ -115,54 +176,64 @@ export function ProfileScreen() {
               )}
             </div>
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h2 className="text-white font-black text-xl">{userData?.name || "Pengguna PICPIC"}</h2>
-                <div className="px-2 py-0.5 bg-white/20 rounded-md backdrop-blur-sm border border-white/10" style={{ backgroundColor: `${getUserTier().color}44` }}>
-                  <span className="text-[8px] text-white font-black uppercase tracking-widest" style={{ color: getUserTier().color === '#9CA3AF' ? 'white' : getUserTier().color }}>
-                    {getUserTier().name}
-                  </span>
-                </div>
-              </div>
+              <h2 className="text-white font-black text-xl mb-0.5">{userData?.name || "Pengguna PICPIC"}</h2>
               <p className="text-white/80 text-sm font-medium">{userData?.email || "picpic@example.com"}</p>
             </div>
           </div>
 
-          {/* Pro Glassmorphism Loyalty Card */}
+          {/* New Premium Loyalty Card Tiered System */}
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="relative h-56 group mt-2"
+            initial={tierConfig.initial}
+            animate={tierConfig.animate}
+            transition={tierConfig.transition}
+            whileHover={tierConfig.hover}
+            className={`relative h-56 group mt-2 perspective-1000`}
           >
-            {/* Background Blobs for Glass Effect */}
-            <div className="absolute inset-0 overflow-hidden rounded-[40px]">
-              <motion.div 
-                animate={{ 
-                  scale: [1, 1.2, 1],
-                  x: [0, 20, 0],
-                  y: [0, -20, 0]
-                }}
-                transition={{ duration: 5, repeat: Infinity }}
-                className="absolute top-0 right-0 w-32 h-32 bg-white/30 rounded-full blur-2xl" 
-              />
-              <motion.div 
-                animate={{ 
-                  scale: [1, 1.3, 1],
-                  x: [0, -30, 0],
-                  y: [0, 10, 0]
-                }}
-                transition={{ duration: 7, repeat: Infinity, delay: 1 }}
-                className="absolute bottom-0 left-0 w-40 h-40 bg-[#D3D8FF]/40 rounded-full blur-3xl opacity-50" 
-              />
+            {/* Background Orbs */}
+            <div className="absolute inset-0 overflow-hidden rounded-[32px]">
+              {tierConfig.orbs.map((orb, i) => (
+                <motion.div
+                  key={i}
+                  className={`absolute ${orb.size} ${orb.color} ${orb.position} rounded-full blur-2xl`}
+                  animate={{
+                    x: [0, 20 * (i + 1), -15 * (i + 1), 0],
+                    y: [0, -15 * (i + 1), 10 * (i + 1), 0],
+                    scale: [1, 1.1, 0.9, 1],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 6 + i * 2,
+                    ease: 'easeInOut',
+                  }}
+                />
+              ))}
             </div>
 
-            <div className="absolute inset-0 bg-white/90 backdrop-blur-3xl rounded-[32px] border border-white p-6 shadow-2xl flex flex-col justify-between overflow-hidden shadow-[#2D2B55]/10">
-              {/* Subtle Texture Overlay */}
-              <div className="absolute inset-0 opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-              
-              {/* Card Decoration Blobs */}
-              <div className="absolute right-[-10%] bottom-[-10%] w-32 h-32 bg-[#6367FF]/10 rounded-full blur-2xl" />
-              <div className="absolute left-[-10%] top-[-10%] w-24 h-24 bg-[#6367FF]/5 rounded-full blur-xl" />
+            <motion.div
+              animate={tierConfig.glow ? {
+                boxShadow: [
+                  '0 10px 30px -5px rgba(251,191,36,0.1)',
+                  '0 20px 50px -5px rgba(251,191,36,0.3)',
+                  '0 10px 30px -5px rgba(251,191,36,0.1)'
+                ]
+              } : {}}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className={`absolute inset-0 ${tierConfig.cardClass} shadow-2xl rounded-[32px] p-6 flex flex-col justify-between overflow-hidden`}
+            >
+              {/* Shimmer Effect */}
+              {tierConfig.shimmerDuration > 0 && (
+                <motion.div
+                  className="absolute inset-0 overflow-hidden rounded-[32px]"
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '150%' }}
+                  transition={{ repeat: Infinity, duration: tierConfig.shimmerDuration, ease: 'linear' }}
+                >
+                  <div className={`w-1/2 h-full bg-gradient-to-r from-transparent ${tierConfig.shimmerClass} to-transparent skew-x-12`} />
+                </motion.div>
+              )}
+
+              {/* Card Texture Layer */}
+              <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
               
               <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-3">
@@ -175,7 +246,7 @@ export function ProfileScreen() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[#2D2B55]/40 font-black text-[8px] uppercase tracking-[0.3em] leading-none mb-1">Official Member</span>
-                    <span className="text-[#2D2B55] font-black text-sm tracking-tighter">PICPIC REWARDS</span>
+                    <span className="text-[#2D2B55] font-black text-sm tracking-tighter uppercase">{getUserTier().name} REWARDS</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
@@ -188,12 +259,12 @@ export function ProfileScreen() {
                 <div className="flex items-end justify-between mb-4">
                   <div className="flex items-baseline gap-2">
                     <motion.span 
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.5, type: "spring", damping: 12 }}
+                      key={userData?.points}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       className="text-[#2D2B55] font-black text-6xl leading-none tracking-tighter"
                     >
-                      {userData?.point_expires_at && new Date(userData.point_expires_at) < new Date() ? 0 : (userData?.points || 0)}
+                      {userData?.points || 0}
                     </motion.span>
                     <div className="flex flex-col">
                       <span className="text-[#2D2B55]/30 font-black text-[10px] uppercase tracking-[0.2em] leading-none mb-1">Total</span>
@@ -210,27 +281,22 @@ export function ProfileScreen() {
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  {userData?.point_expires_at ? (
-                    <div className={`px-4 py-1.5 rounded-full border flex items-center gap-2 ${new Date(userData.point_expires_at) < new Date() ? 'bg-red-50 border-red-100 text-red-600' : 'bg-[#6367FF]/5 border-[#6367FF]/10 text-[#6367FF]'}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${new Date(userData.point_expires_at) < new Date() ? 'bg-red-500 animate-pulse' : 'bg-[#6367FF] shadow-[0_0_8px_rgba(99,103,255,0.4)]'}`} />
-                      <span className="text-[8px] font-black uppercase tracking-widest leading-none">
-                        {new Date(userData.point_expires_at) < new Date() ? 'Points Expired' : `Valid Until ${new Date(userData.point_expires_at).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' }).toUpperCase()}`}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="px-4 py-1.5 bg-[#6367FF]/5 border border-[#6367FF]/10 rounded-full">
-                      <span className="text-[#6367FF] text-[8px] font-black uppercase tracking-widest">Lifetime Membership</span>
-                    </div>
-                  )}
+                  <div className="px-4 py-1.5 bg-[#6367FF]/5 border border-[#6367FF]/10 rounded-full flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#6367FF] shadow-[0_0_8px_rgba(99,103,255,0.4)]" />
+                    <span className="text-[#6367FF] text-[8px] font-black uppercase tracking-widest leading-none">
+                      {userData?.point_expires_at ? `Expires ${new Date(userData.point_expires_at).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' }).toUpperCase()}` : 'Active Status'}
+                    </span>
+                  </div>
                   
-                  <div className="flex flex-col items-end">
-                    <span className="text-[#2D2B55]/40 text-[9px] font-black uppercase tracking-widest" style={{ color: getUserTier().color === '#9CA3AF' ? '#2D2B55' : getUserTier().color }}>
-                      {getUserTier().name} Status
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getUserTier().color }} />
+                    <span className="text-[#2D2B55]/60 text-[9px] font-black uppercase tracking-widest">
+                      {getUserTier().name}
                     </span>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </motion.div>
       </motion.div>
