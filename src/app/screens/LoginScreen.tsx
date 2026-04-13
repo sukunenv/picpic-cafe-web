@@ -18,7 +18,7 @@ export function LoginScreen() {
     setError("");
 
     try {
-      const res = await api.post("/login", { email, password });
+      const res = await api.post("/auth/login", { email, password });
       localStorage.setItem("picpic_auth_token", res.data.token);
       localStorage.setItem("picpic_user", JSON.stringify(res.data.user));
       navigate("/");

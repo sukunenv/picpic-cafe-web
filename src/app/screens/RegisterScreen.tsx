@@ -26,7 +26,7 @@ export function RegisterScreen() {
     }
 
     try {
-      const res = await api.post("/register", { name, email, password });
+      const res = await api.post("/auth/register", { name, email, password });
       localStorage.setItem("picpic_auth_token", res.data.token);
       localStorage.setItem("picpic_user", JSON.stringify(res.data.user));
       navigate("/");
