@@ -1,3 +1,21 @@
-@import './fonts.css';
-@import './tailwind.css';
-@import './theme.css';
+@import "./fonts.css";
+@import "./tailwind.css";
+@import "./theme.css";
+
+:root {
+  --primary: #6367FF;
+  --bg-color: #F8F7FF;
+  --text-dark: #2D2B55;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}

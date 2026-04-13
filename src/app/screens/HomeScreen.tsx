@@ -16,7 +16,7 @@ export function HomeScreen() {
 
   const [categories, setCategories] = useState<any[]>([]);
   const [popularMenu, setPopularMenu] = useState<any[]>([]);
-  const [banner, setBanner] = useState<any>(null);
+  const [banners, setBanners] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,8 +31,41 @@ export function HomeScreen() {
         ]);
         setCategories(categoriesRes.data);
         setPopularMenu(menusRes.data.slice(0, 4));
+        
+        // Handle Banners with fallback
         if (bannersRes.data && bannersRes.data.length > 0) {
-          setBanner(bannersRes.data[0]);
+          setBanners(bannersRes.data.filter((b: any) => b.is_active));
+        } else {
+          // Default fallbacks
+          setBanners([
+            {
+              id: 'def1',
+              title: 'Buy 1 Get 1 Free',
+              subtitle: 'Semua minuman coffee',
+              tag: 'Promo Hari Ini',
+              type: 'gradient',
+              gradient_start: '#6367FF',
+              gradient_end: '#8B5CF6'
+            },
+            {
+              id: 'def2',
+              title: 'Welcome Member',
+              subtitle: 'Diskon 50% transaksi pertama',
+              tag: 'New Offer',
+              type: 'gradient',
+              gradient_start: '#8B5CF6',
+              gradient_end: '#EC4899'
+            },
+            {
+              id: 'def3',
+              title: 'Free Pastry',
+              subtitle: 'Min. belanja 100k',
+              tag: 'Special',
+              type: 'gradient',
+              gradient_start: '#2D2B55',
+              gradient_end: '#6367FF'
+            }
+          ]);
         }
       } catch (err: any) {
         console.error("Error fetching data:", err);
@@ -44,6 +77,19 @@ export function HomeScreen() {
 
     fetchData();
   }, []);
+
+  // ... (keeping existing loaders and error states)
+
+  // Carousel logic snippet (simple auto-slide)
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  useEffect(() => {
+    if (banners.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [banners.length]);
 
   if (isLoading) {
     return (
@@ -70,6 +116,8 @@ export function HomeScreen() {
     );
   }
 
+  const activeBanner = banners[currentBannerIndex] || banners[0];
+
   return (
     <div className="min-h-screen bg-[#F8F7FF]">
       {/* FULL BLEED HERO */}
@@ -82,7 +130,7 @@ export function HomeScreen() {
         {/* Hero Image */}
         <div className="absolute inset-0">
           <img
-            src={banner?.image || "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080"}
+            src={banners[0]?.image || "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080"}
             alt="Coffee"
             onError={(e) => (e.currentTarget.src = "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080")}
             className="w-full h-full object-cover"
@@ -145,28 +193,56 @@ export function HomeScreen() {
         </div>
       </motion.div>
 
-      {/* PROMO STRIP */}
+      {/* PROMO STRIP - CAROUSEL */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.6 }}
         className="-mt-6 mx-6 mb-8"
       >
-        <Link to="/menu" className="block relative overflow-hidden rounded-3xl group">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#6367FF] to-[#8494FF]" />
-          <div className="relative px-6 py-5 flex items-center justify-between">
+        <Link to="/menu" className="block relative overflow-hidden rounded-3xl group h-32 shadow-xl shadow-[#6367FF]/20">
+          <motion.div 
+            key={activeBanner?.id}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="absolute inset-0"
+          >
+            {activeBanner?.type === 'image' && activeBanner?.image ? (
+              <>
+                <img src={activeBanner.image} className="w-full h-full object-cover" alt="promo" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+              </>
+            ) : (
+              <div 
+                className="w-full h-full" 
+                style={{ background: `linear-gradient(to right, ${activeBanner?.gradient_start || '#6367FF'}, ${activeBanner?.gradient_end || '#8494FF'})` }}
+              />
+            )}
+          </motion.div>
+
+          <div className="relative px-6 py-5 flex items-center justify-between h-full">
             <div>
-              <div className="inline-flex items-center gap-1.5 bg-[#FFDBFD] text-[#2D2B55] px-3 py-1 rounded-full text-xs font-bold mb-2">
+              <div className="inline-flex items-center gap-1.5 bg-[#FFDBFD] text-[#2D2B55] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-2 shadow-sm">
                 <Sparkles size={12} />
-                Promo Hari Ini
+                {activeBanner?.tag || 'Promo'}
               </div>
-              <p className="text-white font-bold text-xl">Buy 1 Get 1 Free</p>
-              <p className="text-white/90 text-sm">Semua minuman coffee</p>
+              <p className="text-white font-black text-xl leading-tight drop-shadow-md">{activeBanner?.title || 'PicPic Promo'}</p>
+              <p className="text-white/90 text-xs font-medium mt-0.5 drop-shadow-sm">{activeBanner?.subtitle}</p>
             </div>
-            <ChevronRight
-              className="text-white group-hover:translate-x-1 transition-transform"
-              size={24}
-            />
+            <div className="flex flex-col items-center gap-2">
+              <ChevronRight
+                className="text-white group-hover:translate-x-1 transition-transform"
+                size={24}
+              />
+              {banners.length > 1 && (
+                <div className="flex gap-1">
+                  {banners.map((_, i) => (
+                    <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentBannerIndex ? 'bg-white w-3' : 'bg-white/40'}`} />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </Link>
       </motion.div>
@@ -185,37 +261,25 @@ export function HomeScreen() {
         {categories.length === 0 ? (
           <div className="px-6 text-[#2D2B55]/50 text-sm">Tidak ada kategori.</div>
         ) : (
-          <div className="grid grid-cols-2 gap-0">
-            {categories.map((category, index) => (
-              <Link
-                key={category.id}
-                to={`/menu?category=${category.name}`}
+          <div className="grid grid-cols-2 gap-0 overflow-hidden">
+            {categories.map((cat) => (
+              <Link 
+                to={`/menu?category=${cat.name}`}
+                key={cat.id} 
                 className="relative aspect-square overflow-hidden group"
               >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8 + index * 0.1 }}
-                  className="h-full"
-                >
-                  {category.image ? (
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      onError={(e) => (e.currentTarget.src = logo)}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#6367FF] to-[#C9BEFF] flex items-center justify-center p-4">
-                      {/* Placeholder pattern if no image */}
-                      <div className="w-full h-full border-4 border-white/20 rounded-full" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#2D2B55]/80 via-[#2D2B55]/30 to-transparent group-hover:from-[#6367FF]/80 transition-all duration-500" />
-                  <div className="absolute inset-0 flex items-end p-6">
-                    <p className="text-white font-bold text-2xl">{category.name}</p>
-                  </div>
-                </motion.div>
+                <img 
+                  src={cat.image || 'https://via.placeholder.com/400?text=Category'} 
+                  alt={cat.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#2D2B55]/80 via-[#2D2B55]/30 to-transparent group-hover:from-[#6367FF]/80 group-hover:to-[#6367FF]/30 transition-all duration-500" />
+                
+                {/* Text Content */}
+                <span className="absolute bottom-4 left-4 text-white font-black text-2xl drop-shadow-lg z-10">
+                  {cat.name}
+                </span>
               </Link>
             ))}
           </div>
