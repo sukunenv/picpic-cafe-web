@@ -91,11 +91,38 @@ export function HomeScreen() {
     }
   }, [banners.length]);
 
+  const optimizeImage = (url: string | undefined, width = 500, height = 500) => {
+    if (!url || !url.includes('res.cloudinary.com')) return url;
+    if (url.includes('/upload/') && !url.includes('q_auto')) {
+      return url.replace('/upload/', `/upload/w_${width},h_${height},c_fill,q_auto,f_auto/`);
+    }
+    return url;
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F8F7FF] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-[#6367FF] border-t-transparent animate-spin" />
-        <p className="text-[#6367FF] font-semibold">Memuat menu...</p>
+      <div className="min-h-screen bg-[#F8F7FF] px-6 animate-pulse pt-10">
+        <div className="flex justify-between items-center mb-10">
+          <div className="flex gap-3 items-center">
+            <div className="w-12 h-12 bg-gray-200 rounded-full" />
+            <div className="space-y-2">
+              <div className="w-20 h-3 bg-gray-200 rounded-full" />
+              <div className="w-32 h-4 bg-gray-200 rounded-full" />
+            </div>
+          </div>
+        </div>
+        <div className="w-full h-48 bg-gray-200 rounded-[30px] mb-12" />
+        <div className="mb-8">
+          <div className="w-32 h-6 bg-gray-200 rounded-full mb-4" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="w-full aspect-square bg-gray-200 rounded-2xl" />
+            <div className="w-full aspect-square bg-gray-200 rounded-2xl" />
+          </div>
+        </div>
+        <div className="space-y-4">
+          <div className="w-full h-28 bg-gray-200 rounded-2xl" />
+          <div className="w-full h-28 bg-gray-200 rounded-2xl" />
+        </div>
       </div>
     );
   }
@@ -130,7 +157,7 @@ export function HomeScreen() {
         {/* Hero Image */}
         <div className="absolute inset-0">
           <img
-            src={banners[0]?.image || "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080"}
+            src={optimizeImage(banners[0]?.image, 1080, 1080) || "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080"}
             alt="Coffee"
             onError={(e) => (e.currentTarget.src = "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080")}
             className="w-full h-full object-cover"
@@ -269,9 +296,10 @@ export function HomeScreen() {
                 className="relative aspect-square overflow-hidden group"
               >
                 <img 
-                  src={cat.image || 'https://via.placeholder.com/400?text=Category'} 
+                  loading="lazy"
+                  src={optimizeImage(cat.image) || 'https://via.placeholder.com/400?text=Category'} 
                   alt={cat.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 bg-gray-200"
                 />
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#2D2B55]/80 via-[#2D2B55]/30 to-transparent group-hover:from-[#6367FF]/80 group-hover:to-[#6367FF]/30 transition-all duration-500" />
@@ -318,16 +346,17 @@ export function HomeScreen() {
                 key={item.id}
                 initial={{ x: -30, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 1.1 + index * 0.1 }}
+                transition={{ delay: 1.1 + (Math.min(index, 5) * 0.1) }}
               >
                 <Link to={`/product/${item.id}`} className="flex gap-4 group">
                   <div className="relative w-28 h-28 flex-shrink-0 rounded-2xl overflow-hidden">
                     {item.image ? (
                       <img
-                        src={item.image}
+                        loading="lazy"
+                        src={optimizeImage(item.image)}
                         alt={item.name}
                         onError={(e) => (e.currentTarget.src = logo)}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-gray-200"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#6367FF] to-[#C9BEFF] flex items-center justify-center">

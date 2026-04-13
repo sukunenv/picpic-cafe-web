@@ -67,15 +67,30 @@ export function ProductDetail() {
     }
   };
 
+  const optimizeImage = (url: string | undefined, width = 1000, height = 1000) => {
+    if (!url || !url.includes('res.cloudinary.com')) return url;
+    if (url.includes('/upload/') && !url.includes('q_auto')) {
+      return url.replace('/upload/', `/upload/w_${width},h_${height},c_fill,q_auto,f_auto/`);
+    }
+    return url;
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F8F7FF] flex flex-col items-center justify-center gap-4">
-        <motion.div 
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-10 h-10 rounded-full border-4 border-[#6367FF] border-t-transparent"
-        />
-        <p className="text-[#6367FF]/60 font-medium">Menyeduh kopimu...</p>
+      <div className="min-h-screen bg-[#F8F7FF] p-0 animate-pulse">
+        <div className="relative h-[55vh] w-full bg-gray-200" />
+        <div className="relative -mt-16 px-6 pb-40">
+          <div className="bg-white rounded-[40px] p-8 shadow-xl">
+            <div className="w-24 h-6 bg-gray-200 rounded-full mb-4" />
+            <div className="w-3/4 h-8 bg-gray-200 rounded-lg mb-2" />
+            <div className="w-1/3 h-6 bg-gray-200 rounded-lg mb-6" />
+            <div className="space-y-3">
+              <div className="w-full h-4 bg-gray-200 rounded" />
+              <div className="w-full h-4 bg-gray-200 rounded" />
+              <div className="w-2/3 h-4 bg-gray-200 rounded" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -106,7 +121,7 @@ export function ProductDetail() {
             initial={{ scale: 1.1, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6 }}
-            src={product.image || "https://images.unsplash.com/photo-1541167760496-162955ed8a9f?q=80&w=1000&auto=format&fit=crop"}
+            src={optimizeImage(product.image) || "https://images.unsplash.com/photo-1541167760496-162955ed8a9f?q=80&w=1000&auto=format&fit=crop"}
             alt={product.name}
             onError={(e) => (e.currentTarget.src = logo)}
             className="w-full h-full object-cover"

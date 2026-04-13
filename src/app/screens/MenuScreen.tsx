@@ -63,6 +63,14 @@ export function MenuScreen() {
     setSearchParams(searchParams);
   };
 
+  const optimizeImage = (url: string | undefined, width = 500, height = 500) => {
+    if (!url || !url.includes('res.cloudinary.com')) return url;
+    if (url.includes('/upload/') && !url.includes('q_auto')) {
+      return url.replace('/upload/', `/upload/w_${width},h_${height},c_fill,q_auto,f_auto/`);
+    }
+    return url;
+  };
+
   const filteredItems = menuItems.filter(item => 
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -118,9 +126,14 @@ export function MenuScreen() {
       {/* Menu Grid */}
       <div className="px-6 mt-6">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-             <div className="w-10 h-10 border-4 border-[#6367FF] border-t-transparent rounded-full animate-spin"></div>
-             <p className="text-[#2D2B55]/60 text-sm">Memuat menu...</p>
+          <div className="grid grid-cols-2 gap-4 animate-pulse pt-4">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="mb-3">
+                <div className="relative aspect-[3/4] rounded-2xl bg-gray-200 mb-3" />
+                <div className="h-4 bg-gray-200 rounded-md w-3/4 mb-1" />
+                <div className="h-3 bg-gray-200 rounded-md w-1/2" />
+              </div>
+            ))}
           </div>
         ) : error ? (
           <div className="text-center py-20">
@@ -148,7 +161,7 @@ export function MenuScreen() {
                     key={item.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: Math.min(index, 5) * 0.05 }}
                   >
                     <Link
                       to={`/product/${item.id}`}
@@ -157,9 +170,10 @@ export function MenuScreen() {
                       <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-3 bg-gray-100">
                         {item.image ? (
                           <img
-                            src={item.image}
+                            loading="lazy"
+                            src={optimizeImage(item.image)}
                             alt={item.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 bg-gray-200"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-[#2D2B55]/20">
