@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
@@ -11,6 +11,17 @@ export function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [countdown, setCountdown] = useState(0);
+
+  useEffect(() => {
+    let timer: any;
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +34,12 @@ export function LoginScreen() {
       localStorage.setItem("picpic_user", JSON.stringify(res.data.user));
       navigate("/");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Email atau password salah. Silakan coba lagi.");
+      if (err.response?.status === 429) {
+        setError("Terlalu banyak percobaan login. Coba lagi dalam 1 menit.");
+        setCountdown(60);
+      } else {
+        setError(err.response?.data?.message || "Email atau password salah. Silakan coba lagi.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -92,17 +108,24 @@ export function LoginScreen() {
               animate={{ opacity: 1, scale: 1 }}
               className="text-red-500 text-sm font-bold text-center bg-red-50 py-3 rounded-xl border border-red-100"
             >
-              {error}
+              {error} 
+              {countdown > 0 && (
+                <span className="block mt-1 font-black text-xs underline uppercase tracking-widest">
+                  Tunggu {countdown} detik lagi
+                </span>
+              )}
             </motion.p>
           )}
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-[#6367FF] text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-[#6367FF]/30 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:active:scale-100 mt-2"
+            disabled={isLoading || countdown > 0}
+            className="w-full bg-[#6367FF] text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-[#6367FF]/30 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:grayscale disabled:active:scale-100 mt-2"
           >
             {isLoading ? (
               <Loader2 className="animate-spin" size={24} />
+            ) : countdown > 0 ? (
+              `Tunggu ${countdown}s`
             ) : (
               <>
                 Masuk <ArrowRight size={20} />
