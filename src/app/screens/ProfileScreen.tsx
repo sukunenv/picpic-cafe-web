@@ -365,7 +365,7 @@ export function ProfileScreen() {
                   ))}
                 </motion.div>
               </AnimatePresence>
-
+              
               {/* Pagination Dots */}
               {orders.length > 5 && (
                 <div className="flex items-center justify-center gap-2 pt-4">

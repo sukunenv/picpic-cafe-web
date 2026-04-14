@@ -1,26 +1,108 @@
 import { useState, useEffect } from "react";
-import { Search, Heart, ArrowLeft, Star } from "lucide-react";
+import { Search, Heart, ArrowLeft, Star, Coffee, UtensilsCrossed, Plus, CheckCircle2 } from "lucide-react";
 import { Link, useSearchParams } from "react-router";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import api from "../../lib/api";
+
+/* ─── Helpers ──────────────────────────────────────────── */
+
+function toTitleCase(str: string): string {
+  if (!str) return str;
+  return str
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/* ─── Shimmer Skeleton Card ─────────────────────────────── */
+function SkeletonCard() {
+  return (
+    <div className="rounded-xl overflow-hidden bg-white shadow-sm border border-gray-50">
+      <div className="relative aspect-square overflow-hidden bg-gray-100">
+        <div className="absolute inset-0 shimmer-sweep" />
+      </div>
+      <div className="p-3 space-y-2">
+        <div className="h-3.5 rounded bg-gray-200 w-4/5" />
+        <div className="h-3 rounded bg-gray-100 w-full" />
+        <div className="flex justify-between items-center pt-2">
+           <div className="h-4 bg-gray-200 rounded w-1/3" />
+           <div className="h-8 w-8 rounded-full bg-gray-200" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Empty State ────────────────────────────────────────── */
+function EmptyState({ query }: { query: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-col items-center justify-center py-20 px-6 text-center"
+    >
+      <div className="w-16 h-16 rounded-full bg-[#F4F3FF] flex items-center justify-center mb-4">
+        <Search size={28} className="text-[#6367FF]/40" />
+      </div>
+      <p className="text-gray-900 font-semibold text-base mb-1">
+        {query ? "Pencarian tidak ditemukan" : "Menu belum tersedia"}
+      </p>
+      <p className="text-gray-500 text-xs max-w-[200px]">
+        Coba gunakan kata kunci lain atau pilih kategori yang berbeda.
+      </p>
+    </motion.div>
+  );
+}
 
 export function MenuScreen() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get("category");
-  
+
   const [categories, setCategories] = useState<any[]>([]);
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState(categoryParam || "all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [toast, setToast] = useState<{ show: boolean, message: string, image?: string }>({ show: false, message: "" });
+
+  const showFeedback = (item: any) => {
+    setToast({ show: true, message: item.name, image: item.image });
+    setTimeout(() => setToast({ show: false, message: "", image: undefined }), 3000);
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent, item: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const payload = {
+      menu_id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: 1,
+      image: item.image,
+    };
+
+    try {
+      await api.post('/cart', payload);
+      showFeedback(item);
+    } catch (err) {
+      console.error("Gagal addToCart via API:", err);
+      const existingCart = JSON.parse(localStorage.getItem('picpic_cart') || '[]');
+      const newItem = { id: Date.now(), menu_id: item.id, quantity: 1, menu: { ...item } };
+      const existingIndex = existingCart.findIndex((i: any) => i.menu_id === item.id);
+      if (existingIndex >= 0) existingCart[existingIndex].quantity += 1;
+      else existingCart.push(newItem);
+      localStorage.setItem('picpic_cart', JSON.stringify(existingCart));
+      showFeedback(item);
+    }
+  };
 
   // Fetch categories once
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.get('/categories');
-        setCategories([{ id: 'all', name: 'Semua', slug: 'Semua' }, ...res.data]);
+        const res = await api.get("/categories");
+        setCategories([{ id: "all", name: "Semua", slug: "all" }, ...res.data]);
       } catch (err) {
         console.error("Error fetching categories:", err);
       }
@@ -28,192 +110,203 @@ export function MenuScreen() {
     fetchCategories();
   }, []);
 
-  // Fetch menus when category changes
+  // Fetch ALL menus once to enable smooth client-side filtering
   useEffect(() => {
-    const fetchMenus = async () => {
+    const fetchAllMenus = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
-        let url = '/menus';
-        if (selectedCategory !== "all") {
-          url = `/menus/category/${selectedCategory}`;
-        }
-        
-        const res = await api.get(url);
+        // Selalu ambil seluruh menu agar filtering client-side bisa berjalan mulus
+        const res = await api.get("/menus");
         setMenuItems(res.data);
       } catch (err: any) {
         console.error("Error fetching menus:", err);
-        setError("Gagal memuat menu. Silakan coba lagi.");
+        setError("Gagal memuat menu.");
       } finally {
         setIsLoading(false);
       }
     };
-
-    fetchMenus();
-  }, [selectedCategory]);
+    fetchAllMenus();
+  }, []); // Hanya fetch sekali saat mounting
 
   const handleCategoryChange = (slug: string) => {
     setSelectedCategory(slug);
-    if (slug === "all") {
-      searchParams.delete("category");
-    } else {
-      searchParams.set("category", slug);
-    }
+    if (slug === "all") searchParams.delete("category");
+    else searchParams.set("category", slug);
     setSearchParams(searchParams);
   };
 
-  const optimizeImage = (url: string | undefined, width = 500, height = 500) => {
-    if (!url || !url.includes('res.cloudinary.com')) return url;
-    if (url.includes('/upload/') && !url.includes('q_auto')) {
-      return url.replace('/upload/', `/upload/w_${width},h_${height},c_fill,q_auto,f_auto/`);
-    }
-    return url;
-  };
-
-  const filteredItems = menuItems.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // LOGIKA FILTERING ASLI: Gabungan Kategori & Search
+  const filteredItems = menuItems.filter((item) => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = 
+      selectedCategory === "all" || 
+      item.category?.slug === selectedCategory || 
+      item.category?.name === selectedCategory ||
+      item.category_id?.toString() === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <main className="min-h-screen pb-24 bg-[#F8F7FF]">
-      {/* Clean Header */}
-      <div className="bg-white sticky top-0 z-20 border-b border-[#2D2B55]/5">
-        <div className="px-6 pt-12 pb-4">
-          <div className="flex items-center gap-4 mb-4">
-            <Link to="/" className="p-2 hover:bg-[#F8F7FF] rounded-full transition-colors">
-              <ArrowLeft className="text-[#2D2B55]" size={24} />
+    <>
+      <style>{`
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .shimmer-sweep {
+          background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.7) 50%, transparent 60%);
+          background-size: 200% 100%;
+          animation: shimmer 1.6s infinite;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+
+      <main className="min-h-screen pb-24 bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-4 pt-12 pb-4">
+          <div className="flex items-center gap-3 mb-4">
+            <Link to="/" className="p-2 -ml-2 text-gray-800">
+              <ArrowLeft size={24} />
             </Link>
-            <h1 className="text-[#2D2B55] font-bold text-2xl flex-1">Menu</h1>
-            <button className="p-2 hover:bg-[#F8F7FF] rounded-full transition-colors">
-              <Heart className="text-[#6367FF]" size={24} />
+            <h1 className="text-xl font-bold flex-1">Menu Kami</h1>
+            <button className="p-2 text-gray-400">
+              <Search size={22} />
             </button>
           </div>
 
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#2D2B55]/40" size={20} />
+          {/* Search Input */}
+          <div className="relative mb-4">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
-              placeholder="Cari menu..."
+              placeholder="Cari menu favoritmu..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-full bg-[#F8F7FF] text-[#2D2B55] placeholder:text-[#2D2B55]/40 border-none focus:outline-none focus:ring-2 focus:ring-[#6367FF]/20"
+              className="w-full pl-11 pr-4 py-2.5 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#6367FF]/20 transition-all"
             />
           </div>
         </div>
 
-        {/* Filter Pills */}
-        <div className="px-6 pb-4 overflow-x-auto scrollbar-hide">
-          <div className="flex gap-2">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => handleCategoryChange(category.name || category.slug)}
-                className={`px-5 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all ${
-                  selectedCategory === (category.name || category.slug)
-                    ? "bg-[#6367FF] text-white"
-                    : "bg-[#F8F7FF] text-[#2D2B55]/85 hover:bg-[#C9BEFF]/30"
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
+        {/* 1. Kategoti Filter (Sticky Horizontal Scroll) */}
+        <div className="sticky top-0 z-20 bg-white shadow-sm pt-1">
+          <div className="flex overflow-x-auto whitespace-nowrap gap-2 px-4 pb-3 scrollbar-hide">
+            {categories.map((category) => {
+              const isActive = selectedCategory === (category.name || category.slug);
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => handleCategoryChange(category.slug || category.name)}
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    selectedCategory === (category.slug || category.name)
+                      ? "bg-[#6367FF] text-white shadow-md shadow-[#6367FF]/20"
+                      : "bg-gray-100 text-gray-600 active:bg-gray-200"
+                  }`}
+                >
+                  {category.name}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </div>
 
-      {/* Menu Grid */}
-      <div className="px-6 mt-6">
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-4 animate-pulse pt-4">
-            {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="mb-3">
-                <div className="relative aspect-[3/4] rounded-2xl bg-gray-200 mb-3" />
-                <div className="h-4 bg-gray-200 rounded-md w-3/4 mb-1" />
-                <div className="h-3 bg-gray-200 rounded-md w-1/2" />
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="text-center py-20">
-            <p className="text-red-500 mb-4">{error}</p>
-            <button 
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-[#6367FF] text-white rounded-full text-sm font-medium"
-            >
-              Coba Lagi
-            </button>
-          </div>
-        ) : (
-          <>
-            <p className="text-[#2D2B55]/85 text-sm mb-4">
-              {filteredItems.length} item ditemukan
-            </p>
-            {filteredItems.length === 0 ? (
-               <div className="text-center py-20 bg-white rounded-3xl">
-                  <p className="text-[#2D2B55]/40">Tidak ada menu yang sesuai.</p>
-               </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {filteredItems.map((item, index) => (
+        {/* 2. Menu Grid */}
+        <div className="mt-4">
+          {isLoading ? (
+            <div className="grid grid-cols-2 gap-3 px-4">
+              {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <EmptyState query={searchQuery} />
+          ) : (
+            <div key={selectedCategory} className="grid grid-cols-2 gap-3 px-4">
+              <AnimatePresence>
+                {filteredItems.map((item) => (
                   <motion.div
                     key={item.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(index, 5) * 0.05 }}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                    className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white flex flex-col border border-gray-100"
                   >
-                    <Link
-                      to={`/product/${item.id}`}
-                      className="block group"
-                    >
-                      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-3 bg-gray-100">
-                        {item.image ? (
-                          <img
-                            loading="lazy"
-                            src={optimizeImage(item.image)}
-                            alt={`Gambar menu ${item.name} - Rp ${Number(item.price).toLocaleString('id-ID')}`}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 bg-gray-200"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-[#2D2B55]/20">
-                             No image
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#2D2B55]/60 via-transparent to-transparent" />
+                  <Link to={`/product/${item.id}`} className="flex flex-col h-full">
+                    {/* Image */}
+                    <div className="relative aspect-square overflow-hidden bg-gray-50">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-                        {/* Rating Badge */}
-                        {Number(item.rating) > 0 && (
-                          <div className="absolute top-3 left-3">
-                            <div className="bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-1">
-                              <Star size={12} className="text-[#FFDBFD] fill-[#FFDBFD]" />
-                              <span className="text-[#2D2B55] text-xs font-bold">{Number(item.rating).toFixed(1)}</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Heart */}
-                        <button className="absolute top-3 right-3 p-2 bg-white/95 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Heart size={14} className="text-[#6367FF]" />
-                        </button>
-
-                        {/* Price on Image */}
-                        <div className="absolute bottom-3 left-3 right-3">
-                          <p className="text-white font-bold text-lg">Rp {Number(item.price).toLocaleString("id-ID")}</p>
-                        </div>
-                      </div>
-
-                      <h3 className="text-[#2D2B55] font-semibold text-sm line-clamp-2 leading-tight">
-                        {item.name}
+                    {/* Text Contents */}
+                    <div className="p-3 flex-1 flex flex-col relative">
+                      <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 mb-0.5">
+                        {toTitleCase(item.name)}
                       </h3>
-                    </Link>
-                  </motion.div>
-                ))}
+                      {/* Deskripsi 1 baris */}
+                      <p className="text-[10px] text-gray-400 line-clamp-1 mb-2">
+                         {item.description || "Pilihan terbaik untuk hari ini"}
+                      </p>
+
+                      <div className="mt-auto flex justify-between items-end">
+                        <p className="text-[#6367FF] font-bold text-sm">
+                          Rp {Number(item.price).toLocaleString("id-ID")}
+                        </p>
+
+                        {/* 3. Tombol "+" (Add to Cart) */}
+                        <button 
+                          onClick={(e) => handleAddToCart(e, item)}
+                          className="w-8 h-8 rounded-full bg-[#6367FF] text-white flex items-center justify-center shadow-md active:scale-95 transition-transform"
+                        >
+                          <Plus size={18} strokeWidth={3} />
+                        </button>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+
+        {/* FLOATING MINI-BAR (PROFESSIONAL VERSION) */}
+        <AnimatePresence>
+          {toast.show && (
+            <motion.div
+              initial={{ y: 50, opacity: 0, scale: 0.95 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.95 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="fixed bottom-24 left-4 right-4 z-[100] pointer-events-none flex justify-center"
+            >
+              <div className="pointer-events-auto min-w-[280px] max-w-full bg-black/80 backdrop-blur-2xl text-white pl-2 pr-5 py-2 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center gap-3 border border-white/10">
+                {/* Product Thumbnail */}
+                <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 shrink-0">
+                   <img src={toast.image} className="w-full h-full object-cover" alt="Added" />
+                </div>
+                
+                <div className="flex-1 flex flex-col justify-center overflow-hidden">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#6367FF] leading-none mb-0.5">Item Ditambahkan</span>
+                  <span className="text-xs font-bold truncate tracking-tight">{toast.message}</span>
+                </div>
+                
+                <div className="w-px h-6 bg-white/10 mx-1" />
+                
+                <Link 
+                  to="/cart"
+                  className="text-[#6367FF] text-[10px] font-black uppercase tracking-tighter whitespace-nowrap hover:text-[#8494FF] transition-colors"
+                >
+                  Checkout →
+                </Link>
               </div>
-            )}
-          </>
-        )}
-      </div>
-    </main>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </main>
+    </>
   );
 }
