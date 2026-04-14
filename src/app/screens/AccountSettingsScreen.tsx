@@ -64,7 +64,7 @@ export function AccountSettingsScreen() {
         body: formData
       });
       const cloudData = await cloudRes.json();
-      const imageUrl = cloudData.secure_url;
+      const imageUrl = cloudData.secure_url.replace('/upload/', '/upload/w_400,h_400,c_fill,q_auto,f_auto/');
 
       // 2. Save URL to Laravel
       await api.put('/auth/profile', { avatar: imageUrl });
