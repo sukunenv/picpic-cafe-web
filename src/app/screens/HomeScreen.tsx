@@ -113,7 +113,7 @@ export function HomeScreen() {
   const activeBanner = banners[currentBannerIndex] || banners[0];
 
   return (
-    <div className="min-h-screen bg-[#F8F7FF]">
+    <main className="min-h-screen bg-[#F8F7FF]">
       {/* FULL BLEED HERO */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -127,7 +127,7 @@ export function HomeScreen() {
             fetchpriority="high"
             loading="eager"
             src={optimizeImage(banners[0]?.image, 1080, 1080) || "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080"}
-            alt="Coffee"
+            alt="Suasana nyaman di PicPic Cafe dengan kopi latte"
             onError={(e) => (e.currentTarget.src = "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080")}
             className="w-full h-full object-cover"
           />
@@ -147,11 +147,14 @@ export function HomeScreen() {
             <div className="flex items-center gap-3">
               <img src={logo} alt="Logo" className="w-12 h-12 rounded-full" />
               <div>
-                <p className="text-white/70 text-xs">{greeting}</p>
+                <p className="text-white/80 text-xs">{greeting}</p>
                 <p className="text-white text-sm">Selamat datang kembali</p>
               </div>
             </div>
-            <button className="p-2.5 bg-white/20 backdrop-blur-sm rounded-full">
+            <button 
+              aria-label="Tambah ke favorit"
+              className="p-2.5 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
+            >
               <Heart className="text-white" size={20} />
             </button>
           </motion.div>
@@ -176,13 +179,13 @@ export function HomeScreen() {
             {/* Search */}
             <div className="mt-6 relative">
               <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#2D2B55]/50"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#2D2B55]/85"
                 size={20}
               />
               <input
                 type="text"
                 placeholder="Cari menu..."
-                className="w-full pl-12 pr-4 py-3.5 rounded-full bg-white/95 backdrop-blur-sm text-[#2D2B55] placeholder:text-[#2D2B55]/50 border-none focus:outline-none focus:ring-2 focus:ring-[#FFDBFD]"
+                className="w-full pl-12 pr-4 py-3.5 rounded-full bg-white/95 backdrop-blur-sm text-[#2D2B55] placeholder:text-[#2D2B55]/85 border-none focus:outline-none focus:ring-2 focus:ring-[#FFDBFD]"
               />
             </div>
           </motion.div>
@@ -255,7 +258,7 @@ export function HomeScreen() {
         </div>
 
         {categories.length === 0 ? (
-          <div className="px-6 text-[#2D2B55]/50 text-sm">Tidak ada kategori.</div>
+          <div className="px-6 text-[#2D2B55]/85 text-sm">Tidak ada kategori.</div>
         ) : (
           <div className="grid grid-cols-2 gap-0 overflow-hidden">
             {categories.map((cat) => (
@@ -267,7 +270,7 @@ export function HomeScreen() {
                 <img 
                   loading="lazy"
                   src={optimizeImage(cat.image) || 'https://via.placeholder.com/400?text=Category'} 
-                  alt={cat.name}
+                  alt={`Kategori menu ${cat.name}`}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 bg-gray-200"
                 />
                 {/* Gradient Overlay */}
@@ -293,7 +296,7 @@ export function HomeScreen() {
         <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="text-[#2D2B55] font-bold text-2xl">Menu Populer</h2>
-            <p className="text-[#2D2B55]/60 text-sm mt-1">Paling disukai pelanggan</p>
+            <p className="text-[#2D2B55]/85 text-sm mt-1">Paling disukai pelanggan</p>
           </div>
           <Link
             to="/menu"
@@ -305,7 +308,7 @@ export function HomeScreen() {
         </div>
 
         {popularMenu.length === 0 ? (
-          <div className="text-[#2D2B55]/50 text-sm text-center py-8">
+          <div className="text-[#2D2B55]/85 text-sm text-center py-8">
             Belum ada menu tersedia.
           </div>
         ) : (
@@ -323,7 +326,7 @@ export function HomeScreen() {
                       <img
                         loading="lazy"
                         src={optimizeImage(item.image)}
-                        alt={item.name}
+                        alt={`Gambar menu ${item.name}`}
                         onError={(e) => (e.currentTarget.src = logo)}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-gray-200"
                       />
@@ -345,7 +348,7 @@ export function HomeScreen() {
                   </div>
                   <div className="flex-1 flex flex-col justify-center">
                     <h3 className="text-[#2D2B55] font-bold text-lg mb-1">{item.name}</h3>
-                    <p className="text-[#2D2B55]/60 text-sm mb-2 line-clamp-1">
+                    <p className="text-[#2D2B55]/85 text-sm mb-2 line-clamp-1">
                       {item.description || "Menu spesial PicPic Cafe"}
                     </p>
                     <p className="text-[#6367FF] font-bold text-lg">
@@ -363,6 +366,6 @@ export function HomeScreen() {
           </div>
         )}
       </motion.div>
-    </div>
+    </main>
   );
 }

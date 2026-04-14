@@ -76,7 +76,7 @@ export function MenuScreen() {
   );
 
   return (
-    <div className="min-h-screen pb-24 bg-[#F8F7FF]">
+    <main className="min-h-screen pb-24 bg-[#F8F7FF]">
       {/* Clean Header */}
       <div className="bg-white sticky top-0 z-20 border-b border-[#2D2B55]/5">
         <div className="px-6 pt-12 pb-4">
@@ -113,7 +113,7 @@ export function MenuScreen() {
                 className={`px-5 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all ${
                   selectedCategory === (category.name || category.slug)
                     ? "bg-[#6367FF] text-white"
-                    : "bg-[#F8F7FF] text-[#2D2B55]/60 hover:bg-[#C9BEFF]/30"
+                    : "bg-[#F8F7FF] text-[#2D2B55]/85 hover:bg-[#C9BEFF]/30"
                 }`}
               >
                 {category.name}
@@ -147,7 +147,7 @@ export function MenuScreen() {
           </div>
         ) : (
           <>
-            <p className="text-[#2D2B55]/60 text-sm mb-4">
+            <p className="text-[#2D2B55]/85 text-sm mb-4">
               {filteredItems.length} item ditemukan
             </p>
             {filteredItems.length === 0 ? (
@@ -172,7 +172,7 @@ export function MenuScreen() {
                           <img
                             loading="lazy"
                             src={optimizeImage(item.image)}
-                            alt={item.name}
+                            alt={`Gambar menu ${item.name} - Rp ${Number(item.price).toLocaleString('id-ID')}`}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 bg-gray-200"
                           />
                         ) : (
@@ -214,6 +214,6 @@ export function MenuScreen() {
           </>
         )}
       </div>
-    </div>
+    </main>
   );
 }

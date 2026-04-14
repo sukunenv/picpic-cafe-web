@@ -138,7 +138,7 @@ export function ProfileScreen() {
     return (
       <div className="min-h-screen bg-[#F8F7FF] flex flex-col items-center justify-center gap-4">
         <div className="w-10 h-10 border-4 border-[#6367FF] border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-[#2D2B55]/60">Memuat profil...</p>
+        <p className="text-[#2D2B55]/85">Memuat profil...</p>
       </div>
     );
   }
@@ -268,7 +268,7 @@ export function ProfileScreen() {
                     </motion.span>
                     <div className="flex flex-col">
                       <span className="text-[#2D2B55]/30 font-black text-[10px] uppercase tracking-[0.2em] leading-none mb-1">Total</span>
-                      <span className="text-[#2D2B55]/60 font-black text-xs uppercase tracking-widest leading-none">Points</span>
+                      <span className="text-[#2D2B55]/85 font-black text-xs uppercase tracking-widest leading-none">Points</span>
                     </div>
                   </div>
                   
@@ -290,7 +290,7 @@ export function ProfileScreen() {
                   
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getUserTier().color }} />
-                    <span className="text-[#2D2B55]/60 text-[9px] font-black uppercase tracking-widest">
+                    <span className="text-[#2D2B55]/85 text-[9px] font-black uppercase tracking-widest">
                       {getUserTier().name}
                     </span>
                   </div>
@@ -346,7 +346,7 @@ export function ProfileScreen() {
                         <div className="flex items-start justify-between mb-1">
                           <div>
                             <h3 className="text-[#2D2B55] font-semibold text-sm">{order.order_number}</h3>
-                            <p className="text-[#2D2B55]/60 text-xs">{new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                            <p className="text-[#2D2B55]/85 text-xs">{new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                           </div>
                           <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
                             order.status === 'completed' ? 'text-green-600 bg-green-50' : 'text-[#6367FF] bg-[#6367FF]/10'
@@ -355,7 +355,7 @@ export function ProfileScreen() {
                           </span>
                         </div>
                         <div className="flex items-center justify-between mt-2">
-                          <span className="text-[#2D2B55]/60 text-xs">{order.order_items?.length || 0} item</span>
+                          <span className="text-[#2D2B55]/85 text-xs">{order.order_items?.length || 0} item</span>
                           <span className="text-[#2D2B55] font-bold text-sm">
                             Rp {Number(order.total).toLocaleString("id-ID")}
                           </span>

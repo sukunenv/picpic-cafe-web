@@ -51,7 +51,7 @@ export function ForgotPasswordScreen() {
           {!isSuccess ? (
             <>
               <h1 className="text-[#2D2B55] font-black text-3xl tracking-tight mb-2">Lupa Password?</h1>
-              <p className="text-[#2D2B55]/60 font-medium">Masukkan email kamu, kami kirim link reset</p>
+              <p className="text-[#2D2B55]/85 font-medium">Masukkan email kamu, kami kirim link reset</p>
             </>
           ) : (
             <>
@@ -63,7 +63,7 @@ export function ForgotPasswordScreen() {
                 <CheckCircle2 size={32} />
               </motion.div>
               <h1 className="text-[#2D2B55] font-black text-2xl tracking-tight mb-2">Berhasil Terkirim!</h1>
-              <p className="text-[#2D2B55]/60 font-medium">
+              <p className="text-[#2D2B55]/85 font-medium">
                 Link reset telah dikirim ke <span className="text-[#2D2B55] font-bold">{email}</span>. <br/>
                 Cek inbox atau folder spam kamu.
               </p>

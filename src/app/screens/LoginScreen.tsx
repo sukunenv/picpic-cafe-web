@@ -61,7 +61,7 @@ export function LoginScreen() {
             className="w-20 h-20 rounded-3xl bg-white p-3 shadow-xl mb-6 shadow-[#6367FF]/10 border border-[#6367FF]/5"
           />
           <h1 className="text-[#2D2B55] font-black text-3xl tracking-tight mb-2">Selamat Datang</h1>
-          <p className="text-[#2D2B55]/60 font-medium">Masuk ke akun kamu</p>
+          <p className="text-[#2D2B55]/85 font-medium">Masuk ke akun kamu</p>
         </div>
 
         {/* Form Section */}
@@ -91,7 +91,7 @@ export function LoginScreen() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2D2B55]/30 hover:text-[#2D2B55]/60 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2D2B55]/30 hover:text-[#2D2B55]/85 transition-colors"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -136,7 +136,7 @@ export function LoginScreen() {
         </form>
 
         <div className="mt-10 text-center">
-          <p className="text-[#2D2B55]/60 font-medium">
+          <p className="text-[#2D2B55]/85 font-medium">
             Belum punya akun?{' '}
             <Link to="/register" className="text-[#6367FF] font-black hover:underline px-1">
               Daftar

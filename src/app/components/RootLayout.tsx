@@ -19,7 +19,7 @@ export function RootLayout() {
   }, [location.pathname]);
 
   return (
-    <div className={`min-h-screen bg-[#F8F7FF] ${isProductDetail ? '' : 'pb-16'}`}>
+    <div className={`min-h-screen bg-[#F8F7FF] ${isProductDetail ? '' : 'pb-24'}`}>
       <div className="max-w-md mx-auto">
         <Outlet />
       </div>

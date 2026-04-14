@@ -19,7 +19,7 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-[#6367FF]/10 z-50 shadow-2xl">
+    <nav className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-xl border-t border-[#6367FF]/10 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0,05)]">
       <div className="max-w-md mx-auto flex justify-around items-center h-20 px-6">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -28,6 +28,7 @@ export function BottomNav() {
             <Link
               key={item.path}
               to={item.path}
+              aria-label={`Buka halaman ${item.label}`}
               className={`flex flex-col items-center justify-center gap-1.5 transition-all relative ${
                 active ? "text-[#6367FF]" : "text-[#717182]"
               }`}

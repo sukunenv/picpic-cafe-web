@@ -123,7 +123,7 @@ export function CartScreen() {
     return (
       <div className="min-h-screen bg-[#F8F7FF] flex flex-col items-center justify-center gap-4">
         <div className="w-10 h-10 border-4 border-[#6367FF] border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-[#2D2B55]/60">Memuat keranjang...</p>
+        <p className="text-[#2D2B55]/85">Memuat keranjang...</p>
       </div>
     );
   }
@@ -139,7 +139,7 @@ export function CartScreen() {
             </Link>
             <div className="flex-1">
               <h1 className="text-[#2D2B55] font-bold text-2xl">Keranjang</h1>
-              <p className="text-[#2D2B55]/60 text-sm">{cartItems.length} item</p>
+              <p className="text-[#2D2B55]/85 text-sm">{cartItems.length} item</p>
             </div>
           </div>
         </div>
@@ -156,7 +156,7 @@ export function CartScreen() {
             <div className="w-20 h-20 bg-[#C9BEFF]/20 rounded-full mx-auto mb-4 flex items-center justify-center">
               <Tag className="text-[#6367FF]" size={32} />
             </div>
-            <p className="text-[#2D2B55]/60 text-base mb-6">Keranjang masih kosong</p>
+            <p className="text-[#2D2B55]/85 text-base mb-6">Keranjang masih kosong</p>
             <Link
               to="/menu"
               className="inline-block px-8 py-3 bg-[#6367FF] text-white rounded-full font-bold active:scale-95 transition-transform"
@@ -196,7 +196,7 @@ export function CartScreen() {
                       <p className="text-[#6367FF] font-bold text-base mb-2">
                         Rp {Number(item.menu?.price || 0).toLocaleString("id-ID")}
                       </p>
-                      <span className="text-[#2D2B55]/60 text-xs bg-[#F8F7FF] px-3 py-1 rounded-full">
+                      <span className="text-[#2D2B55]/85 text-xs bg-[#F8F7FF] px-3 py-1 rounded-full">
                         {item.quantity}x
                       </span>
                     </div>
@@ -283,7 +283,7 @@ export function CartScreen() {
                       <img src="/qris.png" alt="QRIS" className="w-48 h-48 object-contain" />
                     </div>
                     <p className="text-[#2D2B55] font-black text-xl mb-1">Rp {total.toLocaleString("id-ID")}</p>
-                    <p className="text-[#2D2B55]/60 text-xs">Simpan QR dan scan di aplikasi e-wallet kamu</p>
+                    <p className="text-[#2D2B55]/85 text-xs">Simpan QR dan scan di aplikasi e-wallet kamu</p>
                   </motion.div>
                 )}
 
@@ -340,7 +340,7 @@ export function CartScreen() {
                   >
                     <Banknote className="text-[#6367FF] mb-2" size={32} />
                     <p className="text-[#6367FF] font-black text-sm uppercase tracking-widest">Bayar di Kasir</p>
-                    <p className="text-[#2D2B55]/60 text-xs text-center">Silakan selesaikan pesanan dan lakukan pembayaran di kasir outlet kami.</p>
+                    <p className="text-[#2D2B55]/85 text-xs text-center">Silakan selesaikan pesanan dan lakukan pembayaran di kasir outlet kami.</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -350,12 +350,12 @@ export function CartScreen() {
             <div className="mb-6 bg-white rounded-2xl p-5 border border-[#2D2B55]/5">
               <h2 className="text-[#2D2B55] font-bold text-lg mb-4">Ringkasan</h2>
               <div className="space-y-3 mb-4">
-                <div className="flex justify-between text-[#2D2B55]/60 text-sm">
+                <div className="flex justify-between text-[#2D2B55]/85 text-sm">
                   <span>Subtotal</span>
                   <span>Rp {subtotal.toLocaleString("id-ID")}</span>
                 </div>
                 {deliveryFee > 0 && (
-                  <div className="flex justify-between text-[#2D2B55]/60 text-sm">
+                  <div className="flex justify-between text-[#2D2B55]/85 text-sm">
                     <span>Pengiriman</span>
                     <span>Rp {deliveryFee.toLocaleString("id-ID")}</span>
                   </div>

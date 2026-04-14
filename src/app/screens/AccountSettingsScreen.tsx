@@ -126,7 +126,7 @@ export function AccountSettingsScreen() {
     return (
       <div className="min-h-screen bg-[#F8F7FF] flex flex-col items-center justify-center gap-4">
         <Loader2 className="animate-spin text-[#6367FF]" size={40} />
-        <p className="text-[#2D2B55]/60 font-medium">Memuat pengaturan...</p>
+        <p className="text-[#2D2B55]/85 font-medium">Memuat pengaturan...</p>
       </div>
     );
   }
@@ -334,7 +334,7 @@ export function AccountSettingsScreen() {
                 <Trash2 size={32} />
               </div>
               <h3 className="text-[#2D2B55] font-black text-xl mb-2 tracking-tight">Hapus Akun?</h3>
-              <p className="text-[#2D2B55]/50 text-sm font-medium leading-relaxed mb-8">
+              <p className="text-[#2D2B55]/85 text-sm font-medium leading-relaxed mb-8">
                 Apakah Anda yakin ingin menghapus akun? Semua poin <span className="text-red-600 font-bold">{userData?.points} Pts</span> akan hangus selamanya.
               </p>
               <div className="flex flex-col gap-3">
