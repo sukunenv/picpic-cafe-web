@@ -1,8 +1,8 @@
 import { Search, ChevronRight, Heart, Star, Sparkles } from "lucide-react";
 import { Link } from "react-router";
 import { motion } from "motion/react";
-import { useState, useEffect } from "react";
-import api from "../../lib/api";
+import { useState, useEffect, useMemo } from "react";
+import { useApiCache } from "../../lib/useApiCache";
 import logo from "figma:asset/c67b6433ddedf46738312a77f1fae7b733129f87.png";
 
 export function HomeScreen() {
@@ -14,69 +14,38 @@ export function HomeScreen() {
       ? "Selamat Siang"
       : "Selamat Malam";
 
-  const [categories, setCategories] = useState<any[]>([]);
-  const [popularMenu, setPopularMenu] = useState<any[]>([]);
-  const [banners, setBanners] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // --- Cached API calls (stale after 5 minutes) ---
+  const { data: categoriesData, isLoading: loadingCats } = useApiCache<any[]>(
+    'categories',
+    '/categories',
+    { staleTime: 5 * 60 * 1000 }
+  );
+  const { data: menusData, isLoading: loadingMenus } = useApiCache<any[]>(
+    'menus',
+    '/menus',
+    { staleTime: 5 * 60 * 1000 }
+  );
+  const { data: bannersData, isLoading: loadingBanners, error } = useApiCache<any[]>(
+    'banners',
+    '/banners',
+    { staleTime: 5 * 60 * 1000 }
+  );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const [categoriesRes, menusRes, bannersRes] = await Promise.all([
-          api.get("/categories"),
-          api.get("/menus"),
-          api.get("/banners"),
-        ]);
-        setCategories(categoriesRes.data);
-        setPopularMenu(menusRes.data.slice(0, 4));
-        
-        // Handle Banners with fallback
-        if (bannersRes.data && bannersRes.data.length > 0) {
-          setBanners(bannersRes.data.filter((b: any) => b.is_active));
-        } else {
-          // Default fallbacks
-          setBanners([
-            {
-              id: 'def1',
-              title: 'Buy 1 Get 1 Free',
-              subtitle: 'Semua minuman coffee',
-              tag: 'Promo Hari Ini',
-              type: 'gradient',
-              gradient_start: '#6367FF',
-              gradient_end: '#8B5CF6'
-            },
-            {
-              id: 'def2',
-              title: 'Welcome Member',
-              subtitle: 'Diskon 50% transaksi pertama',
-              tag: 'New Offer',
-              type: 'gradient',
-              gradient_start: '#8B5CF6',
-              gradient_end: '#EC4899'
-            },
-            {
-              id: 'def3',
-              title: 'Free Pastry',
-              subtitle: 'Min. belanja 100k',
-              tag: 'Special',
-              type: 'gradient',
-              gradient_start: '#2D2B55',
-              gradient_end: '#6367FF'
-            }
-          ]);
-        }
-      } catch (err: any) {
-        console.error("Error fetching data:", err);
-        setError("Gagal memuat data. Silakan coba lagi.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const isLoading = loadingCats || loadingMenus || loadingBanners;
 
-    fetchData();
-  }, []);
+  const categories = categoriesData ?? [];
+  const popularMenu = useMemo(() => (menusData ?? []).slice(0, 4), [menusData]);
+
+  const defaultBanners = [
+    { id: 'def1', title: 'Buy 1 Get 1 Free', subtitle: 'Semua minuman coffee', tag: 'Promo Hari Ini', type: 'gradient', gradient_start: '#6367FF', gradient_end: '#8B5CF6' },
+    { id: 'def2', title: 'Welcome Member', subtitle: 'Diskon 50% transaksi pertama', tag: 'New Offer', type: 'gradient', gradient_start: '#8B5CF6', gradient_end: '#EC4899' },
+    { id: 'def3', title: 'Free Pastry', subtitle: 'Min. belanja 100k', tag: 'Special', type: 'gradient', gradient_start: '#2D2B55', gradient_end: '#6367FF' },
+  ];
+
+  const banners = useMemo(() => {
+    const active = (bannersData ?? []).filter((b: any) => b.is_active);
+    return active.length > 0 ? active : defaultBanners;
+  }, [bannersData]);
 
   // Carousel logic snippet (simple auto-slide)
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
