@@ -32,6 +32,7 @@ export function LoginScreen() {
       const res = await api.post("/auth/login", { email, password });
       localStorage.setItem("picpic_auth_token", res.data.token);
       localStorage.setItem("picpic_user", JSON.stringify(res.data.user));
+      localStorage.setItem("token_expires_at", res.data.expires_at);
       navigate("/");
     } catch (err: any) {
       if (err.response?.status === 429) {
