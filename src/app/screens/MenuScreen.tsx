@@ -168,7 +168,7 @@ export function MenuScreen() {
             <Link to="/" className="p-2 -ml-2 text-gray-800">
               <ArrowLeft size={24} />
             </Link>
-            <h1 className="text-xl font-bold flex-1">Menu Kami</h1>
+            <h1 className="text-2xl font-black text-[#2D2B55] flex-1 tracking-tight">Menu Kami</h1>
             <button className="p-2 text-gray-400">
               <Search size={22} />
             </button>
@@ -182,7 +182,7 @@ export function MenuScreen() {
               placeholder="Cari menu favoritmu..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#6367FF]/20 transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-gray-100 rounded-2xl text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#6367FF]/20 transition-all"
             />
           </div>
         </div>
@@ -196,10 +196,10 @@ export function MenuScreen() {
                 <button
                   key={category.id}
                   onClick={() => handleCategoryChange(category.slug || category.name)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
                     selectedCategory === (category.slug || category.name)
-                      ? "bg-[#6367FF] text-white shadow-md shadow-[#6367FF]/20"
-                      : "bg-gray-100 text-gray-600 active:bg-gray-200"
+                      ? "bg-[#6367FF] text-white shadow-lg shadow-[#6367FF]/20 scale-105"
+                      : "bg-gray-100 text-gray-500 active:bg-gray-200"
                   }`}
                 >
                   {category.name}
@@ -242,16 +242,16 @@ export function MenuScreen() {
 
                     {/* Text Contents */}
                     <div className="p-3 flex-1 flex flex-col relative">
-                      <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 mb-0.5">
+                       <h3 className="text-sm font-black text-[#2D2B55] line-clamp-1 mb-0.5 tracking-tight group-hover:text-[#6367FF] transition-colors">
                         {toTitleCase(item.name)}
                       </h3>
                       {/* Deskripsi 1 baris */}
-                      <p className="text-[10px] text-gray-400 line-clamp-1 mb-2">
+                      <p className="text-[10px] text-gray-400 line-clamp-1 mb-2 font-medium">
                          {item.description || "Pilihan terbaik untuk hari ini"}
                       </p>
 
                       <div className="mt-auto flex justify-between items-end">
-                        <p className="text-[#6367FF] font-bold text-sm">
+                        <p className="text-[#6367FF] font-black text-sm tracking-tighter">
                           Rp {Number(item.price).toLocaleString("id-ID")}
                         </p>
 

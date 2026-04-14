@@ -7,9 +7,11 @@ import { ProductDetail } from "./screens/ProductDetail";
 import { CartScreen } from "./screens/CartScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { LoginScreen } from "./screens/LoginScreen";
+import { MemberCardsScreen } from "./screens/MemberCardsScreen";
 
 const RegisterScreen = React.lazy(() => import("./screens/RegisterScreen").then(m => ({ default: m.RegisterScreen })));
 const ForgotPasswordScreen = React.lazy(() => import("./screens/ForgotPasswordScreen").then(m => ({ default: m.ForgotPasswordScreen })));
+const ResetPasswordScreen = React.lazy(() => import("./screens/ResetPasswordScreen").then(m => ({ default: m.ResetPasswordScreen })));
 const AccountSettingsScreen = React.lazy(() => import("./screens/AccountSettingsScreen").then(m => ({ default: m.AccountSettingsScreen })));
 
 const SuspenseLoader = () => (
@@ -28,10 +30,12 @@ export const router = createBrowserRouter([
       { path: "product/:id", Component: ProductDetail },
       { path: "cart", Component: CartScreen },
       { path: "profile", Component: ProfileScreen },
+      { path: "member-cards", Component: MemberCardsScreen },
       { path: "account-settings", element: <Suspense fallback={<SuspenseLoader />}><AccountSettingsScreen /></Suspense> },
     ],
   },
   { path: "/login", Component: LoginScreen },
   { path: "/register", element: <Suspense fallback={<SuspenseLoader />}><RegisterScreen /></Suspense> },
   { path: "/forgot-password", element: <Suspense fallback={<SuspenseLoader />}><ForgotPasswordScreen /></Suspense> },
+  { path: "/reset-password", element: <Suspense fallback={<SuspenseLoader />}><ResetPasswordScreen /></Suspense> },
 ]);

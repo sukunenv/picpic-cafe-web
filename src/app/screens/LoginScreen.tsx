@@ -97,11 +97,7 @@ export function LoginScreen() {
             </button>
           </div>
 
-          <div className="flex justify-end pr-2">
-            <Link to="/forgot-password" size={14} className="text-[#6367FF] font-bold text-sm hover:underline">
-              Lupa Password?
-            </Link>
-          </div>
+
 
           {error && (
             <motion.p 

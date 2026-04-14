@@ -147,13 +147,13 @@ export function HomeScreen() {
             <div className="flex items-center gap-3">
               <img src={logo} alt="Logo" className="w-12 h-12 rounded-full" />
               <div>
-                <p className="text-white/80 text-xs">{greeting}</p>
-                <p className="text-white text-sm">Selamat datang kembali</p>
+                <p className="text-white/60 text-[10px] font-black uppercase tracking-[0.2em] mb-0.5">{greeting}</p>
+                <p className="text-white font-black text-base tracking-tight leading-none">Selamat Datang</p>
               </div>
             </div>
             <button 
               aria-label="Tambah ke favorit"
-              className="p-2.5 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
+              className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 hover:bg-white/20 transition-all shadow-xl"
             >
               <Heart className="text-white" size={20} />
             </button>
@@ -166,10 +166,10 @@ export function HomeScreen() {
             transition={{ delay: 0.4 }}
             className="mb-8"
           >
-            <h1 className="text-white font-black text-6xl tracking-tight mb-2">
+            <h1 className="text-white font-black text-6xl tracking-tighter drop-shadow-[0_4px_20px_rgba(0,0,0,0.25)] mb-1">
               PICPIC
             </h1>
-            <p className="text-[#FFDBFD] text-lg font-medium mb-1">
+            <p className="text-[#FFDBFD] text-lg font-black mb-1 italic tracking-tight">
               kumpul mencerita
             </p>
             <p className="text-white/80 text-sm max-w-[280px]">
@@ -185,7 +185,7 @@ export function HomeScreen() {
               <input
                 type="text"
                 placeholder="Cari menu..."
-                className="w-full pl-12 pr-4 py-3.5 rounded-full bg-white/95 backdrop-blur-sm text-[#2D2B55] placeholder:text-[#2D2B55]/85 border-none focus:outline-none focus:ring-2 focus:ring-[#FFDBFD]"
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/90 backdrop-blur-xl text-[#2D2B55] placeholder:text-[#2D2B55]/40 border border-white/20 shadow-2xl shadow-black/10 focus:outline-none focus:ring-2 focus:ring-[#6367FF]/30 font-bold transition-all"
               />
             </div>
           </motion.div>
@@ -199,7 +199,7 @@ export function HomeScreen() {
         transition={{ delay: 0.6 }}
         className="-mt-6 mx-6 mb-8"
       >
-        <Link to="/menu" className="block relative overflow-hidden rounded-3xl group h-32 shadow-xl shadow-[#6367FF]/20">
+        <Link to="/menu" className="block relative overflow-hidden rounded-[32px] group shadow-2xl shadow-[#6367FF]/10">
           <motion.div 
             key={activeBanner?.id}
             initial={{ opacity: 0, x: 20 }}
@@ -220,14 +220,14 @@ export function HomeScreen() {
             )}
           </motion.div>
 
-          <div className="relative px-6 py-5 flex items-center justify-between h-full">
+          <div className="relative px-6 py-5 flex items-center justify-between">
             <div>
               <div className="inline-flex items-center gap-1.5 bg-[#FFDBFD] text-[#2D2B55] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-2 shadow-sm">
                 <Sparkles size={12} />
                 {activeBanner?.tag || 'Promo'}
               </div>
-              <p className="text-white font-black text-xl leading-tight drop-shadow-md">{activeBanner?.title || 'PicPic Promo'}</p>
-              <p className="text-white/90 text-xs font-medium mt-0.5 drop-shadow-sm">{activeBanner?.subtitle}</p>
+              <p className="text-white font-bold text-lg leading-tight drop-shadow-sm">{activeBanner?.title || 'PicPic Promo'}</p>
+              <p className="text-white/80 text-[10px] font-medium mt-0.5 drop-shadow-sm">{activeBanner?.subtitle}</p>
             </div>
             <div className="flex flex-col items-center gap-2">
               <ChevronRight
@@ -254,7 +254,7 @@ export function HomeScreen() {
         className="mb-12"
       >
         <div className="px-6 mb-4">
-          <h2 className="text-[#2D2B55] font-bold text-2xl">Kategori</h2>
+          <h2 className="text-[#2D2B55] font-black text-2xl tracking-tighter">Kategori</h2>
         </div>
 
         {categories.length === 0 ? (
@@ -273,8 +273,11 @@ export function HomeScreen() {
                   alt={`Kategori menu ${cat.name}`}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 bg-gray-200"
                 />
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#2D2B55]/80 via-[#2D2B55]/30 to-transparent group-hover:from-[#6367FF]/80 group-hover:to-[#6367FF]/30 transition-all duration-500" />
+                {/* Default Gradient (Dark) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#2D2B55]/80 via-transparent to-transparent transition-opacity duration-500 group-hover:opacity-0" />
+                
+                {/* Hover Blue Shadow (Lively - Hover & Touch) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#6367FF]/90 via-[#6367FF]/40 to-transparent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-300" />
                 
                 {/* Text Content */}
                 <span className="absolute bottom-4 left-4 text-white font-black text-2xl drop-shadow-lg z-10">
@@ -295,15 +298,15 @@ export function HomeScreen() {
       >
         <div className="flex items-end justify-between mb-6">
           <div>
-            <h2 className="text-[#2D2B55] font-bold text-2xl">Menu Populer</h2>
-            <p className="text-[#2D2B55]/85 text-sm mt-1">Paling disukai pelanggan</p>
+            <h2 className="text-[#2D2B55] font-black text-2xl tracking-tighter">Menu Populer</h2>
+            <p className="text-[#2D2B55]/50 text-[10px] font-black uppercase tracking-widest mt-1">Paling disukai pelanggan</p>
           </div>
           <Link
             to="/menu"
-            className="text-[#6367FF] font-bold text-sm flex items-center gap-1"
+            className="text-[#6367FF] font-black text-[10px] uppercase tracking-widest flex items-center gap-2 bg-white px-5 py-2.5 rounded-2xl shadow-lg shadow-[#6367FF]/5 active:scale-95 transition-all border border-gray-50"
           >
             Lihat Semua
-            <ChevronRight size={18} />
+            <ChevronRight size={14} strokeWidth={3} />
           </Link>
         </div>
 
@@ -320,15 +323,15 @@ export function HomeScreen() {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 1.1 + (Math.min(index, 5) * 0.1) }}
               >
-                <Link to={`/product/${item.id}`} className="flex gap-4 group">
-                  <div className="relative w-28 h-28 flex-shrink-0 rounded-2xl overflow-hidden">
+                <Link to={`/product/${item.id}`} className="flex gap-4 group p-3 rounded-[32px] hover:bg-white hover:shadow-2xl hover:shadow-[#6367FF]/5 transition-all active:scale-[0.98]">
+                  <div className="relative w-28 h-28 flex-shrink-0 rounded-2xl overflow-hidden shadow-sm">
                     {item.image ? (
                       <img
                         loading="lazy"
                         src={optimizeImage(item.image)}
                         alt={`Gambar menu ${item.name}`}
                         onError={(e) => (e.currentTarget.src = logo)}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-gray-200"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 bg-gray-50"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#6367FF] to-[#C9BEFF] flex items-center justify-center">
@@ -347,11 +350,11 @@ export function HomeScreen() {
                     </div>
                   </div>
                   <div className="flex-1 flex flex-col justify-center">
-                    <h3 className="text-[#2D2B55] font-bold text-lg mb-1">{item.name}</h3>
-                    <p className="text-[#2D2B55]/85 text-sm mb-2 line-clamp-1">
+                    <h3 className="text-[#2D2B55] font-bold text-lg mb-0.5 tracking-tight group-hover:text-[#6367FF] transition-colors">{item.name}</h3>
+                    <p className="text-[#2D2B55]/60 text-sm mb-2 line-clamp-1 font-medium">
                       {item.description || "Menu spesial PicPic Cafe"}
                     </p>
-                    <p className="text-[#6367FF] font-bold text-lg">
+                    <p className="text-[#6367FF] font-black text-lg tracking-tighter">
                       Rp {Number(item.price).toLocaleString("id-ID")}
                     </p>
                   </div>

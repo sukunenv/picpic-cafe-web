@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star, Clock } from "lucide-react";
+import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star, Clock, ChevronRight } from "lucide-react";
 import { useParams, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import api from "../../lib/api";
@@ -10,6 +10,7 @@ export function ProductDetail() {
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const [product, setProduct] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -113,7 +114,7 @@ export function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-[#F8F7FF] font-['Plus_Jakarta_Sans',sans-serif]">
-      <div className="max-w-[390px] mx-auto relative bg-white min-h-screen shadow-2xl shadow-[#2D2B55]/5">
+      <div className="max-w-md mx-auto relative bg-white min-h-screen">
         
         {/* HERO IMAGE SECTION */}
         <div className="relative h-[55vh] w-full overflow-hidden">
@@ -170,7 +171,7 @@ export function ProductDetail() {
               </div>
             </div>
 
-            <h1 className="text-[#2D2B55] font-black text-3xl leading-tight mb-2 uppercase">
+            <h1 className="text-[#2D2B55] font-black text-3xl leading-tight mb-2 tracking-tighter">
               {product.name}
             </h1>
             
@@ -178,11 +179,36 @@ export function ProductDetail() {
               Rp {Number(product.price).toLocaleString("id-ID")}
             </p>
 
+            {/* Slim Horizontal Quantity Selector */}
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-[#2D2B55]/5">
+              <div className="flex flex-col">
+                <span className="text-[#2D2B55] font-black text-sm uppercase tracking-tight">Jumlah</span>
+                <span className="text-[#2D2B55]/40 text-[10px] font-bold">Sesuaikan pesanan</span>
+              </div>
+              <div className="flex items-center gap-5">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D2B55]/5 text-[#2D2B55] active:scale-95 transition-all"
+                >
+                  <Minus size={16} strokeWidth={3} />
+                </button>
+                <span className="text-[#2D2B55] font-black text-xl min-w-[24px] text-center">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-10 bg-[#6367FF] rounded-full flex items-center justify-center text-white shadow-lg shadow-[#6367FF]/20 active:scale-95 transition-all"
+                >
+                  <Plus size={16} strokeWidth={3} />
+                </button>
+              </div>
+            </div>
+
             <div className="space-y-6">
               {/* Description */}
               <div>
-                <h3 className="text-[#2D2B55] font-extrabold text-sm mb-2 uppercase tracking-wider opacity-40">Deskripsi</h3>
-                <p className="text-[#2D2B55]/70 text-sm leading-relaxed font-medium">
+                <h3 className="text-[#2D2B55] font-black text-[10px] mb-2 uppercase tracking-[0.2em] opacity-30">Deskripsi Produk</h3>
+                <p className="text-[#2D2B55]/70 text-sm leading-relaxed font-bold">
                   {product.description || "Rasakan kenikmatan racikan kopi spesial dari barisista ahli kami, dibuat khusus untuk menambah semangat harimu di PicPic Cafe."}
                 </p>
               </div>
@@ -191,63 +217,88 @@ export function ProductDetail() {
               <div className="flex gap-4">
                 <div className="flex flex-col gap-1">
                   <span className="text-[10px] font-black uppercase opacity-30">Waktu</span>
-                  <div className="flex items-center gap-1.5 text-[#2D2B55] font-bold text-xs">
-                    <Clock size={14} className="text-[#6367FF]" />
-                    <span>~12 Min</span>
-                  </div>
+                    <span className="text-[#2D2B55] font-black text-xs tracking-tight">
+                      <Clock size={14} className="text-[#6367FF] inline mr-1.5" />
+                      ~12 Menit
+                    </span>
                 </div>
                 <div className="w-px h-8 bg-[#2D2B55]/5" />
                 <div className="flex flex-col gap-1">
                   <span className="text-[10px] font-black uppercase opacity-30">Suhu</span>
-                  <div className="flex items-center gap-1.5 text-[#2D2B55] font-bold text-xs">
-                    <span>Panas / Dingin</span>
-                  </div>
+                    <span className="text-[#2D2B55] font-black text-xs tracking-tight">Panas / Dingin</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Quantity Selector */}
-          <div className="mt-8 flex flex-col items-center">
-            <h3 className="text-[#2D2B55] font-black text-[10px] uppercase tracking-widest mb-4 opacity-40">Jumlah Pesanan</h3>
-            <div className="flex items-center gap-10 bg-white p-2 rounded-full shadow-lg shadow-[#2D2B55]/5 border border-[#2D2B55]/5">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-12 h-12 rounded-full flex items-center justify-center border-2 border-[#2D2B55]/5 text-[#2D2B55] hover:bg-[#F8F7FF] transition-colors active:scale-95"
-              >
-                <Minus size={20} strokeWidth={3} />
-              </button>
-              <span className="text-[#2D2B55] font-black text-2xl min-w-[20px] text-center">
-                {quantity}
-              </span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="w-12 h-12 bg-[#6367FF] rounded-full flex items-center justify-center text-white shadow-lg shadow-[#6367FF]/30 hover:bg-[#4F53E8] transition-colors active:scale-95"
-              >
-                <Plus size={20} strokeWidth={3} />
-              </button>
-            </div>
-          </div>
         </motion.div>
 
-        {/* FIXED BOTTOM CTA */}
-        <div className="fixed bottom-0 left-0 right-0 z-50">
-          <div className="max-w-[390px] mx-auto px-6 pb-10 pt-6 bg-white/80 backdrop-blur-xl border-t border-[#2D2B55]/5 flex items-center gap-6">
-            <div className="flex flex-col">
-              <span className="text-[#2D2B55]/40 text-[10px] font-black uppercase tracking-widest">Total Harga</span>
-              <span className="text-[#2D2B55] font-black text-xl">
-                Rp {(Number(product.price) * quantity).toLocaleString("id-ID")}
-              </span>
+        {/* Floating Expandable ADD TO CART Button Above BottomNav */}
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-md px-5 z-[51] flex flex-col items-center pointer-events-none">
+          <motion.div
+            layout
+            initial={false}
+            animate={{ 
+              width: isExpanded ? "100%" : "64px",
+              x: isExpanded ? 0 : 140
+            }}
+            className="bg-[#6367FF] rounded-[32px] shadow-[0_20px_50px_rgba(99,103,255,0.4)] overflow-hidden pointer-events-auto relative"
+          >
+            <div className="flex items-center h-16 w-full">
+              {/* Trigger Button (On the LEFT when expanded) */}
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-16 h-16 flex-shrink-0 flex items-center justify-center text-white relative z-20"
+              >
+                {isExpanded ? (
+                  <motion.div
+                    initial={{ rotate: -180 }}
+                    animate={{ rotate: 0 }}
+                  >
+                    <ChevronRight size={28} strokeWidth={3} />
+                  </motion.div>
+                ) : (
+                  <Plus size={28} strokeWidth={3} />
+                )}
+              </button>
+
+              {/* Expanded Content */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="flex-1 flex items-center justify-between pr-4 overflow-hidden whitespace-nowrap"
+                  >
+                    <div className="flex flex-col items-start mr-4">
+                      <span className="text-[10px] font-black uppercase tracking-[0.1em] text-white/90">Total Harga</span>
+                      <span className="text-xl font-black tracking-tight text-white">
+                        Rp {(Number(product.price) * quantity).toLocaleString("id-ID")}
+                      </span>
+                    </div>
+                    
+                    <button
+                      onClick={handleAddToCart}
+                      className="bg-white text-[#6367FF] px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all shadow-lg"
+                    >
+                      <ShoppingCart size={14} strokeWidth={4} />
+                      Tambahkan
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
+              {/* Shimmer Effect */}
+              {!isExpanded && (
+                <motion.div 
+                  animate={{ x: ['-100%', '200%'] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent w-full skew-x-[-20deg]"
+                />
+              )}
             </div>
-            
-            <button
-              onClick={handleAddToCart}
-              className="flex-1 h-16 bg-[#6367FF] text-white rounded-3xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-2xl shadow-[#6367FF]/40 active:scale-95 transition-all hover:bg-[#4F53E8]"
-            >
-              <ShoppingCart size={18} strokeWidth={3} />
-              Tambah
-            </button>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

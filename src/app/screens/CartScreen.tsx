@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Trash2, Tag, ChevronRight, Banknote, QrCode, Building2, CheckCircle2, MapPin } from "lucide-react";
+import { ArrowLeft, Trash2, Tag, ChevronRight, Banknote, QrCode, Building2, CheckCircle2, MapPin, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import api from "../../lib/api";
@@ -22,6 +22,7 @@ export function CartScreen() {
   const [lastOrder, setLastOrder] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
   const [tableNumber, setTableNumber] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     fetchCart();
@@ -132,14 +133,14 @@ export function CartScreen() {
     <div className="min-h-screen pb-32 bg-[#F8F7FF]">
       {/* Clean Header */}
       <div className="bg-white sticky top-0 z-20 border-b border-[#2D2B55]/5">
-        <div className="px-6 pt-12 pb-4">
+        <div className="px-6 pt-10 pb-3">
           <div className="flex items-center gap-4">
             <Link to="/" className="p-2 hover:bg-[#F8F7FF] rounded-full transition-colors">
               <ArrowLeft className="text-[#2D2B55]" size={24} />
             </Link>
             <div className="flex-1">
-              <h1 className="text-[#2D2B55] font-bold text-2xl">Keranjang</h1>
-              <p className="text-[#2D2B55]/85 text-sm">{cartItems.length} item</p>
+              <h1 className="text-[#2D2B55] font-black text-2xl tracking-tighter">Keranjang</h1>
+              <p className="text-[#2D2B55]/40 text-[10px] font-black uppercase tracking-widest leading-none mt-1">{cartItems.length} item tersimpan</p>
             </div>
           </div>
         </div>
@@ -167,8 +168,8 @@ export function CartScreen() {
         ) : (
           <>
             {/* Items List */}
-            <div className="mb-8">
-              <h2 className="text-[#2D2B55] font-bold text-lg mb-4">Pesanan Anda</h2>
+            <div className="mb-6">
+              <h2 className="text-[#2D2B55] font-black text-sm uppercase tracking-widest opacity-40 mb-3">Daftar Pesanan</h2>
               <div className="space-y-3">
                 {cartItems.map((item, index) => (
                   <motion.div
@@ -176,7 +177,7 @@ export function CartScreen() {
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-white rounded-2xl p-4 flex gap-3"
+                    className="bg-white rounded-[28px] p-4 flex gap-4 shadow-sm shadow-[#2D2B55]/5 border border-[#2D2B55]/5 group"
                   >
                     <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
                       {item.menu?.image ? (
@@ -190,14 +191,14 @@ export function CartScreen() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-[#2D2B55] font-semibold text-sm mb-1 line-clamp-1">
+                      <h3 className="text-[#2D2B55] font-bold text-sm mb-0.5 line-clamp-1">
                         {item.menu?.name || "Menu tidak dikenal"}
                       </h3>
-                      <p className="text-[#6367FF] font-bold text-base mb-2">
+                      <p className="text-[#6367FF] font-black text-base mb-2 tracking-tighter">
                         Rp {Number(item.menu?.price || 0).toLocaleString("id-ID")}
                       </p>
-                      <span className="text-[#2D2B55]/85 text-xs bg-[#F8F7FF] px-3 py-1 rounded-full">
-                        {item.quantity}x
+                      <span className="text-[#2D2B55] font-black text-[10px] bg-[#F8F7FF] px-3 py-1.5 rounded-full uppercase tracking-widest">
+                        {item.quantity}x Pesanan
                       </span>
                     </div>
                     <button
@@ -214,7 +215,7 @@ export function CartScreen() {
             {/* Table Number & Notes */}
             <div className="mb-8 space-y-4">
               <div>
-                <h2 className="text-[#2D2B55] font-bold text-lg mb-4">Nomor Meja</h2>
+                <h2 className="text-[#2D2B55] font-black text-sm uppercase tracking-widest opacity-40 mb-3">Informasi Meja</h2>
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6367FF]/40" size={18} />
                   <input
@@ -222,26 +223,26 @@ export function CartScreen() {
                     value={tableNumber}
                     onChange={(e) => setTableNumber(e.target.value)}
                     placeholder="Contoh: 5, A3, VIP (Opsional)"
-                    className="w-full pl-12 pr-4 py-3 bg-white rounded-xl text-[#2D2B55] placeholder:text-[#2D2B55]/40 border border-[#2D2B55]/10 focus:outline-none focus:border-[#6367FF] transition-colors"
+                    className="w-full pl-11 pr-4 py-2.5 bg-white rounded-2xl text-[#2D2B55] font-bold placeholder:text-[#2D2B55]/30 border border-[#2D2B55]/10 focus:outline-none focus:border-[#6367FF] shadow-sm shadow-[#2D2B55]/5 transition-all text-sm"
                   />
                 </div>
               </div>
 
               <div>
-                <h2 className="text-[#2D2B55] font-bold text-lg mb-4">Catatan Pesanan</h2>
+                <h2 className="text-[#2D2B55] font-black text-sm uppercase tracking-widest opacity-40 mb-3">Instruksi Tambahan</h2>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Contoh: Es batu dipisah, kurangin gula, dll."
-                  rows={3}
-                  className="w-full px-4 py-3 bg-white rounded-xl text-[#2D2B55] placeholder:text-[#2D2B55]/40 border border-[#2D2B55]/10 focus:outline-none focus:border-[#6367FF] transition-colors resize-none"
+                  rows={2}
+                  className="w-full px-4 py-3 bg-white rounded-2xl text-[#2D2B55] font-medium placeholder:text-[#2D2B55]/30 border border-[#2D2B55]/10 focus:outline-none focus:border-[#6367FF] shadow-sm shadow-[#2D2B55]/5 transition-all resize-none text-sm"
                 />
               </div>
             </div>
 
             {/* Payment */}
-            <div className="mb-8">
-              <h2 className="text-[#2D2B55] font-bold text-lg mb-4">Metode Pembayaran</h2>
+            <div className="mb-6">
+              <h2 className="text-[#2D2B55] font-black text-sm uppercase tracking-widest opacity-40 mb-3">Metode Pembayaran</h2>
               <div className="grid grid-cols-3 gap-3">
                 {paymentMethods.map((method) => {
                   const Icon = method.icon;
@@ -249,19 +250,19 @@ export function CartScreen() {
                     <button
                       key={method.id}
                       onClick={() => setSelectedPayment(method.id)}
-                      className={`flex flex-col items-center justify-center p-4 rounded-3xl transition-all border-2 ${
+                      className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all border-2 ${
                         selectedPayment === method.id
-                          ? "bg-[#6367FF]/5 border-[#6367FF]"
+                          ? "bg-[#6367FF] border-[#6367FF] shadow-lg shadow-[#6367FF]/30 scale-[1.02]"
                           : "bg-white border-transparent shadow-sm shadow-[#2D2B55]/5"
                       }`}
                     >
-                      <div className={`p-2 rounded-2xl mb-2 transition-all ${
-                        selectedPayment === method.id ? "bg-[#6367FF] text-white" : "bg-[#F8F7FF] text-[#6367FF]"
+                      <div className={`p-1.5 rounded-xl mb-1 transition-all ${
+                        selectedPayment === method.id ? "bg-white text-[#6367FF]" : "bg-[#F8F7FF] text-[#6367FF]"
                       }`}>
-                        <Icon size={20} />
+                        <Icon size={18} />
                       </div>
-                      <span className={`text-[10px] font-bold tracking-wider ${
-                        selectedPayment === method.id ? "text-[#6367FF]" : "text-[#2D2B55]/40"
+                      <span className={`text-[8px] font-black uppercase tracking-widest ${
+                        selectedPayment === method.id ? "text-white" : "text-[#2D2B55]/30"
                       }`}>{method.name}</span>
                     </button>
                   );
@@ -347,8 +348,8 @@ export function CartScreen() {
             </div>
 
             {/* Summary */}
-            <div className="mb-6 bg-white rounded-2xl p-5 border border-[#2D2B55]/5">
-              <h2 className="text-[#2D2B55] font-bold text-lg mb-4">Ringkasan</h2>
+            <div className="mb-6 bg-white rounded-[32px] p-6 border border-[#2D2B55]/5 shadow-sm shadow-[#2D2B55]/5">
+              <h2 className="text-[#2D2B55] font-black text-lg tracking-tight mb-4">Ringkasan Pembayaran</h2>
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between text-[#2D2B55]/85 text-sm">
                   <span>Subtotal</span>
@@ -368,42 +369,86 @@ export function CartScreen() {
                 )}
               </div>
               <div className="pt-3 border-t border-[#2D2B55]/10 flex justify-between items-center">
-                <span className="text-[#2D2B55] font-bold">Total</span>
-                <span className="text-[#6367FF] font-bold text-2xl">Rp {total.toLocaleString("id-ID")}</span>
+                <span className="text-[#2D2B55] font-black text-sm uppercase tracking-widest opacity-40">Total Tagihan</span>
+                <span className="text-[#6367FF] font-black text-2xl tracking-tighter">Rp {total.toLocaleString("id-ID")}</span>
               </div>
             </div>
           </>
         )}
       </motion.div>
 
-      {/* Improved Fixed Checkout Button */}
+      {/* Expandable Checkout Button Above BottomNav */}
       {cartItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white p-5 pb-8 z-[60] border-t border-[#2D2B55]/5">
-          <button
-            onClick={handleCheckout}
-            disabled={isCheckingOut || !selectedPayment}
-            className="w-full bg-[#6367FF] text-white rounded-[32px] p-5 flex items-center justify-between shadow-xl shadow-[#6367FF]/30 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
-          >
-            {isCheckingOut ? (
-              <div className="w-full flex items-center justify-center gap-3">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm font-black uppercase tracking-widest">Memproses...</span>
+        <div className="fixed bottom-24 inset-x-0 z-[51] flex justify-center px-5 pointer-events-none">
+          <div className="w-full max-w-md flex justify-end">
+            <motion.div
+              layout
+              initial={false}
+              animate={{ 
+                width: isExpanded ? "100%" : "64px",
+              }}
+              className="bg-[#6367FF] rounded-[32px] shadow-[0_20px_50px_rgba(99,103,255,0.4)] overflow-hidden pointer-events-auto relative"
+            >
+              <div className="flex items-center h-16 w-full">
+                {/* Trigger Button (On the LEFT when expanded) */}
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="w-16 h-16 flex-shrink-0 flex items-center justify-center text-white relative z-20"
+                >
+                  {isExpanded ? (
+                    <motion.div
+                      initial={{ rotate: -180 }}
+                      animate={{ rotate: 0 }}
+                    >
+                      <ChevronRight size={28} strokeWidth={3} />
+                    </motion.div>
+                  ) : (
+                    <div className="relative">
+                      <ShoppingCart size={24} strokeWidth={2.5} />
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-[#6367FF] text-[10px] font-black rounded-full flex items-center justify-center">
+                        {cartItems.length}
+                      </span>
+                    </div>
+                  )}
+                </button>
+
+                {/* Expanded Content - Content on the right of the arrow */}
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="flex-1 flex items-center justify-between pr-4 overflow-hidden whitespace-nowrap"
+                    >
+                      <div className="flex flex-col items-start mr-4">
+                        <span className="text-[10px] font-black uppercase tracking-[0.1em] text-white/90">Total Tagihan</span>
+                        <span className="text-lg font-black tracking-tight text-white">Rp {total.toLocaleString("id-ID")}</span>
+                      </div>
+                      
+                      <button
+                        onClick={handleCheckout}
+                        disabled={isCheckingOut || !selectedPayment}
+                        className="bg-white text-[#6367FF] px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all disabled:opacity-50"
+                      >
+                        {isCheckingOut ? "..." : "Bayar"}
+                        <ChevronRight size={14} strokeWidth={4} />
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                
+                {/* Shimmer Effect */}
+                {!isExpanded && (
+                  <motion.div 
+                    animate={{ x: ['-100%', '200%'] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent w-full skew-x-[-20deg]"
+                  />
+                )}
               </div>
-            ) : (
-              <>
-                <div className="flex flex-col items-start">
-                  <span className="text-[10px] font-bold tracking-widest opacity-70 mb-0.5">Total Pembayaran</span>
-                  <span className="text-xl font-black">Rp {total.toLocaleString("id-ID")}</span>
-                </div>
-                <div className="flex items-center gap-2 pr-4">
-                  <span className="text-base font-extrabold tracking-tight">Proses Pesanan</span>
-                  <div className="bg-white/20 p-2 rounded-xl">
-                    <ChevronRight size={18} strokeWidth={3} />
-                  </div>
-                </div>
-              </>
-            )}
-          </button>
+            </motion.div>
+          </div>
         </div>
       )}
 

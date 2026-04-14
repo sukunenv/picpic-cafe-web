@@ -23,7 +23,7 @@ export function RootLayout() {
       <div className="max-w-md mx-auto">
         <Outlet />
       </div>
-      {!isProductDetail && <BottomNav />}
+      <BottomNav />
     </div>
   );
 }
