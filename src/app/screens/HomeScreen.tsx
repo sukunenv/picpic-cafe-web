@@ -155,6 +155,8 @@ export function HomeScreen() {
         {/* Hero Image */}
         <div className="absolute inset-0">
           <img
+            fetchpriority="high"
+            loading="eager"
             src={optimizeImage(banners[0]?.image, 1080, 1080) || "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080"}
             alt="Coffee"
             onError={(e) => (e.currentTarget.src = "https://images.unsplash.com/photo-1766610953352-69d6f26d7f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBsYXR0ZSUyMGFydCUyMGNhZmUlMjBpbnRlcmlvciUyMHdhcm0lMjBjb3p5fGVufDF8fHx8MTc3NTg4OTMwNHww&ixlib=rb-4.1.0&q=80&w=1080")}
