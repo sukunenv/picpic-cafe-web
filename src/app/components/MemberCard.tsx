@@ -46,7 +46,7 @@ export function MemberCard({
   tier,
   points,
   memberSince = "Jan 2026",
-  cardNumber = "4532 8976 1234",
+  cardNumber = "4231 2604 1001 8888",
 }: MemberCardProps) {
   const config = tierConfig[tier] || tierConfig.bronze;
   const Icon = config.icon;

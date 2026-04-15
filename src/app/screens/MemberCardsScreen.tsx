@@ -80,7 +80,7 @@ export function MemberCardsScreen() {
               </p>
             </div>
           </div>
-          <MemberCard tier="bronze" points={250} memberSince="Jan 2026" cardNumber="4532 8976 1234" />
+          <MemberCard tier="bronze" points={250} memberSince="Jan 2026" cardNumber="4231 2604 1001 8888" />
           <div className="mt-5 bg-white rounded-[28px] p-6 border border-gray-100 shadow-sm shadow-black/[0.01]">
             <p className="text-[#2D2B55] font-black text-[8px] uppercase tracking-[0.25em] mb-4 opacity-30">Exclusive Benefits:</p>
             <ul className="space-y-3">
@@ -112,7 +112,7 @@ export function MemberCardsScreen() {
               </p>
             </div>
           </div>
-          <MemberCard tier="silver" points={1250} memberSince="Jan 2026" cardNumber="4532 8976 5678" />
+          <MemberCard tier="silver" points={1250} memberSince="Jan 2026" cardNumber="4231 2604 2001 8888" />
           <div className="mt-5 bg-white rounded-[28px] p-6 border border-gray-100 shadow-sm shadow-black/[0.01]">
             <p className="text-[#2D2B55] font-black text-[8px] uppercase tracking-[0.25em] mb-4 opacity-30">Exclusive Benefits:</p>
             <ul className="space-y-3">
@@ -144,7 +144,7 @@ export function MemberCardsScreen() {
               </p>
             </div>
           </div>
-          <MemberCard tier="gold" points={2850} memberSince="Jan 2026" cardNumber="4532 8976 9012" />
+          <MemberCard tier="gold" points={2850} memberSince="Jan 2026" cardNumber="4231 2604 3001 8888" />
           <div className="mt-5 bg-white rounded-[28px] p-6 border border-gray-100 shadow-sm shadow-black/[0.01]">
             <p className="text-[#2D2B55] font-black text-[8px] uppercase tracking-[0.25em] mb-4 opacity-30">Exclusive Benefits:</p>
             <ul className="space-y-3">
