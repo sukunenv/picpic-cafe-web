@@ -136,8 +136,11 @@ export function MenuScreen() {
     setSearchParams(searchParams);
   };
 
-  // LOGIKA FILTERING ASLI: Gabungan Kategori & Search
   const filteredItems = menuItems.filter((item) => {
+    // 1. Cek Ketersediaan (Status Off / On)
+    if (!item.is_available) return false;
+
+    // 2. Pencarian dan Kategori
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = 
       selectedCategory === "all" || 
