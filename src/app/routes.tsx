@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import { createBrowserRouter } from "react-router";
 import { RootLayout } from "./components/RootLayout";
+import { RequireAuth } from "./components/RequireAuth";
 import { HomeScreen } from "./screens/HomeScreen";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ProductDetail } from "./screens/ProductDetail";
@@ -25,13 +26,34 @@ export const router = createBrowserRouter([
     path: "/",
     Component: RootLayout,
     children: [
+      // Public routes — bisa diakses tanpa login
       { index: true, Component: HomeScreen },
       { path: "menu", Component: MenuScreen },
       { path: "product/:id", Component: ProductDetail },
-      { path: "cart", Component: CartScreen },
-      { path: "profile", Component: ProfileScreen },
-      { path: "member-cards", Component: MemberCardsScreen },
-      { path: "account-settings", element: <Suspense fallback={<SuspenseLoader />}><AccountSettingsScreen /></Suspense> },
+
+      // Protected routes — harus login sebagai member
+      {
+        path: "cart",
+        element: <RequireAuth><CartScreen /></RequireAuth>,
+      },
+      {
+        path: "profile",
+        element: <RequireAuth><ProfileScreen /></RequireAuth>,
+      },
+      {
+        path: "member-cards",
+        element: <RequireAuth><MemberCardsScreen /></RequireAuth>,
+      },
+      {
+        path: "account-settings",
+        element: (
+          <RequireAuth>
+            <Suspense fallback={<SuspenseLoader />}>
+              <AccountSettingsScreen />
+            </Suspense>
+          </RequireAuth>
+        ),
+      },
     ],
   },
   { path: "/login", Component: LoginScreen },
