@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Heart, ArrowLeft, Star, Coffee, UtensilsCrossed, Plus, CheckCircle2 } from "lucide-react";
+import { Search, Heart, ArrowLeft, Star, Coffee, UtensilsCrossed, Plus, CheckCircle2, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import api from "../../lib/api";
@@ -64,36 +64,41 @@ export function MenuScreen() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [toast, setToast] = useState<{ show: boolean, message: string, image?: string }>({ show: false, message: "" });
+  const [variantModal, setVariantModal] = useState<{ open: boolean; menu: any | null }>({ open: false, menu: null });
 
   const showFeedback = (item: any) => {
     setToast({ show: true, message: item.name, image: item.image });
     setTimeout(() => setToast({ show: false, message: "", image: undefined }), 3000);
   };
 
-  const handleAddToCart = async (e: React.MouseEvent, item: any) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleAddToCart = async (e: React.MouseEvent | null, menu: any, variant: any | null = null) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
     const payload = {
-      menu_id: item.id,
-      name: item.name,
-      price: item.price,
+      menu_id: menu.id,
+      variant_id: variant?.id ?? null,
+      name: menu.name,
+      price: variant ? variant.price : menu.price,
       quantity: 1,
-      image: item.image,
+      image: menu.image,
+      variant_name: variant?.name ?? null,
     };
 
     try {
       await api.post('/cart', payload);
-      showFeedback(item);
+      showFeedback(menu);
     } catch (err) {
       console.error("Gagal addToCart via API:", err);
       const existingCart = JSON.parse(localStorage.getItem('picpic_cart') || '[]');
-      const newItem = { id: Date.now(), menu_id: item.id, quantity: 1, menu: { ...item } };
-      const existingIndex = existingCart.findIndex((i: any) => i.menu_id === item.id);
+      const newItem = { id: Date.now(), menu_id: menu.id, variant_id: variant?.id ?? null, quantity: 1, menu: { ...menu }, variant: variant ? { ...variant } : null };
+      const existingIndex = existingCart.findIndex((i: any) => i.menu_id === menu.id && i.variant_id === (variant?.id ?? null));
       if (existingIndex >= 0) existingCart[existingIndex].quantity += 1;
       else existingCart.push(newItem);
       localStorage.setItem('picpic_cart', JSON.stringify(existingCart));
-      showFeedback(item);
+      showFeedback(menu);
     }
   };
 
@@ -254,13 +259,24 @@ export function MenuScreen() {
                       </p>
 
                       <div className="mt-auto flex justify-between items-end">
-                        <p className="text-[#6367FF] font-black text-sm tracking-tighter">
-                          Rp {Number(item.price).toLocaleString("id-ID")}
+                        <p className="text-[#6367FF] font-black text-sm tracking-tighter flex items-center">
+                          {item.variants && item.variants.length > 0 && (
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-1">Mulai dari</span>
+                          )}
+                          Rp {(item.variants && item.variants.length > 0 ? Math.min(...item.variants.map((v: any) => v.price)) : Number(item.price)).toLocaleString("id-ID")}
                         </p>
 
                         {/* 3. Tombol "+" (Add to Cart) */}
                         <button 
-                          onClick={(e) => handleAddToCart(e, item)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (item.variants && item.variants.length > 0) {
+                              setVariantModal({ open: true, menu: item });
+                            } else {
+                              handleAddToCart(e, item, null);
+                            }
+                          }}
                           className="w-8 h-8 rounded-full bg-[#6367FF] text-white flex items-center justify-center shadow-md active:scale-95 transition-transform"
                         >
                           <Plus size={18} strokeWidth={3} />
@@ -308,6 +324,60 @@ export function MenuScreen() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Variant Selection Modal */}
+        {variantModal.open && variantModal.menu && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <div 
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              onClick={() => setVariantModal({ open: false, menu: null })}
+            />
+            <div className="bg-white w-full max-w-[320px] rounded-3xl shadow-2xl overflow-hidden relative z-10 animate-in zoom-in duration-300">
+              <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-white">
+                <div>
+                  <h2 className="text-base font-black text-[#2D2B55] uppercase tracking-tight">
+                    {variantModal.menu.name}
+                  </h2>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Pilih varian</p>
+                </div>
+                <button onClick={() => setVariantModal({ open: false, menu: null })} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
+                  <X size={18} className="text-gray-400" />
+                </button>
+              </div>
+              
+              <div className="p-4 max-h-[50vh] overflow-y-auto">
+                <div className="space-y-3">
+                  {variantModal.menu.variants?.map((variant: any) => (
+                    <button
+                      key={variant.id}
+                      onClick={() => {
+                        handleAddToCart(null, variantModal.menu, variant);
+                        setVariantModal({ open: false, menu: null });
+                      }}
+                      className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-gray-100 hover:border-[#6367FF] hover:bg-[#6367FF]/5 transition-all text-left group"
+                    >
+                      <span className="font-bold text-sm text-[#2D2B55] group-hover:text-[#6367FF]">
+                        {variant.name}
+                      </span>
+                      <span className="font-black text-sm text-[#6367FF]">
+                        Rp {Number(variant.price).toLocaleString('id-ID')}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-gray-100 bg-white">
+                <button
+                  onClick={() => setVariantModal({ open: false, menu: null })}
+                  className="w-full py-3 border-2 border-gray-200 text-gray-400 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-gray-50 transition-all"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </main>
     </>

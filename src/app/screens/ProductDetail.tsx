@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star, Clock, ChevronRight } from "lucide-react";
+import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star, Clock, ChevronRight, X } from "lucide-react";
 import { useParams, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import api from "../../lib/api";
@@ -11,6 +11,14 @@ export function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState<any | null>(null);
+
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(price)
 
   const [product, setProduct] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,10 +46,12 @@ export function ProductDetail() {
     
     const payload = {
       menu_id: product.id,
+      variant_id: selectedVariant?.id ?? null,
       name: product.name,
-      price: product.price,
+      price: selectedVariant ? selectedVariant.price : product.price,
       quantity: quantity,
       image: product.image,
+      variant_name: selectedVariant?.name ?? null,
     };
 
     try {
@@ -52,11 +62,13 @@ export function ProductDetail() {
       const newItem = {
         id: Date.now(),
         menu_id: product.id,
+        variant_id: selectedVariant?.id ?? null,
         quantity: quantity,
-        menu: { ...product }
+        menu: { ...product },
+        variant: selectedVariant ? { ...selectedVariant } : null
       };
 
-      const existingIndex = existingCart.findIndex((item: any) => item.menu_id === product.id);
+      const existingIndex = existingCart.findIndex((item: any) => item.menu_id === product.id && item.variant_id === (selectedVariant?.id ?? null));
       if (existingIndex >= 0) {
         existingCart[existingIndex].quantity += quantity;
       } else {
@@ -175,9 +187,39 @@ export function ProductDetail() {
               {product.name}
             </h1>
             
-            <p className="text-[#6367FF] font-black text-2xl mb-6">
-              Rp {Number(product.price).toLocaleString("id-ID")}
+            <p className="text-[#6367FF] font-black text-2xl mb-6 flex items-center">
+              {!selectedVariant && product.variants && product.variants.length > 0 && (
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-2">Mulai dari</span>
+              )}
+              {formatPrice(selectedVariant ? selectedVariant.price : (product.variants && product.variants.length > 0 ? Math.min(...product.variants.map((v: any) => v.price)) : Number(product.price)))}
             </p>
+
+            {/* INLINE VARIANT SELECTION */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-[#2D2B55] font-black text-[10px] mb-3 uppercase tracking-[0.2em] opacity-30">Pilih Varian</h3>
+                <div className="flex flex-col gap-2">
+                  {product.variants.map((variant: any) => (
+                    <button
+                      key={variant.id}
+                      onClick={() => setSelectedVariant(variant)}
+                      className={`flex items-center justify-between p-3.5 rounded-2xl border-2 transition-all text-left ${
+                        selectedVariant?.id === variant.id 
+                          ? 'border-[#6367FF] bg-[#6367FF]/5' 
+                          : 'border-gray-100 hover:border-[#6367FF]/30 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className={`font-bold text-sm ${selectedVariant?.id === variant.id ? 'text-[#6367FF]' : 'text-[#2D2B55]'}`}>
+                        {variant.name}
+                      </span>
+                      <span className={`font-black text-sm ${selectedVariant?.id === variant.id ? 'text-[#6367FF]' : 'text-gray-500'}`}>
+                        {formatPrice(Number(variant.price))}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Slim Horizontal Quantity Selector */}
             <div className="flex items-center justify-between mb-8 pb-6 border-b border-[#2D2B55]/5">
@@ -273,17 +315,31 @@ export function ProductDetail() {
                   >
                     <div className="flex flex-col items-start mr-4">
                       <span className="text-[10px] font-black uppercase tracking-[0.1em] text-white/90">Total Harga</span>
-                      <span className="text-xl font-black tracking-tight text-white">
-                        Rp {(Number(product.price) * quantity).toLocaleString("id-ID")}
+                      <span className="text-xl font-black tracking-tight text-white flex items-center">
+                        {!selectedVariant && product.variants && product.variants.length > 0 && (
+                          <span className="text-[8px] opacity-70 font-bold uppercase tracking-widest mr-1">Mulai</span>
+                        )}
+                        {formatPrice((selectedVariant ? selectedVariant.price : (product.variants && product.variants.length > 0 ? Math.min(...product.variants.map((v: any) => v.price)) : Number(product.price))) * quantity)}
                       </span>
                     </div>
                     
                     <button
                       onClick={handleAddToCart}
-                      className="bg-white text-[#6367FF] px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all shadow-lg"
+                      disabled={product.variants && product.variants.length > 0 && !selectedVariant}
+                      className={`px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all shadow-lg ${
+                        product.variants && product.variants.length > 0 && !selectedVariant 
+                          ? 'bg-white/50 text-white/80 cursor-not-allowed' 
+                          : 'bg-white text-[#6367FF]'
+                      }`}
                     >
-                      <ShoppingCart size={14} strokeWidth={4} />
-                      Tambahkan
+                      {product.variants && product.variants.length > 0 && !selectedVariant ? (
+                        "Pilih Varian"
+                      ) : (
+                        <>
+                          <ShoppingCart size={14} strokeWidth={4} />
+                          Tambahkan
+                        </>
+                      )}
                     </button>
                   </motion.div>
                 )}
@@ -300,6 +356,9 @@ export function ProductDetail() {
             </div>
           </motion.div>
         </div>
+
+
+
       </div>
     </div>
   );

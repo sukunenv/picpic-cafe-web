@@ -67,7 +67,10 @@ export function CartScreen() {
     }
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (Number(item.menu?.price || 0) * item.quantity), 0);
+  const subtotal = cartItems.reduce((sum, item) => {
+    const itemPrice = item.variant?.price ?? item.menu?.price ?? 0;
+    return sum + (Number(itemPrice) * item.quantity);
+  }, 0);
   const deliveryFee = 0; // Free for now as it's a cafe
   const discount = 0;
   const total = subtotal + deliveryFee - discount;
@@ -194,8 +197,13 @@ export function CartScreen() {
                       <h3 className="text-[#2D2B55] font-bold text-sm mb-0.5 line-clamp-1">
                         {item.menu?.name || "Menu tidak dikenal"}
                       </h3>
+                      {item.variant && (
+                        <p className="text-[10px] font-bold text-[#6367FF] bg-[#6367FF]/10 inline-block px-2 py-0.5 rounded-full mb-1">
+                          {item.variant.name}
+                        </p>
+                      )}
                       <p className="text-[#6367FF] font-black text-base mb-2 tracking-tighter">
-                        Rp {Number(item.menu?.price || 0).toLocaleString("id-ID")}
+                        Rp {Number(item.variant?.price ?? item.menu?.price ?? 0).toLocaleString("id-ID")}
                       </p>
                       <span className="text-[#2D2B55] font-black text-[10px] bg-[#F8F7FF] px-3 py-1.5 rounded-full uppercase tracking-widest">
                         {item.quantity}x Pesanan
