@@ -254,16 +254,30 @@ export function CartScreen() {
               <div className="grid grid-cols-3 gap-3">
                 {paymentMethods.map((method) => {
                   const Icon = method.icon;
+                  const isQris = method.id === 'qris';
                   return (
                     <button
                       key={method.id}
-                      onClick={() => setSelectedPayment(method.id)}
-                      className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all border-2 ${
+                      onClick={() => {
+                        if (isQris) {
+                          alert("Pembayaran QRIS sedang dalam pengembangan 🚧");
+                          return;
+                        }
+                        setSelectedPayment(method.id);
+                      }}
+                      className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all border-2 relative ${
                         selectedPayment === method.id
                           ? "bg-[#6367FF] border-[#6367FF] shadow-lg shadow-[#6367FF]/30 scale-[1.02]"
                           : "bg-white border-transparent shadow-sm shadow-[#2D2B55]/5"
-                      }`}
+                      } ${isQris ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
+                      {isQris && (
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap">
+                          <span className="text-[8px] bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full font-black uppercase tracking-tighter shadow-sm">
+                            Segera Hadir
+                          </span>
+                        </div>
+                      )}
                       <div className={`p-1.5 rounded-xl mb-1 transition-all ${
                         selectedPayment === method.id ? "bg-white text-[#6367FF]" : "bg-[#F8F7FF] text-[#6367FF]"
                       }`}>

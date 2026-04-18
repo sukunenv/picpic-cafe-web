@@ -30,11 +30,16 @@ export function HomeScreen() {
     '/banners',
     { staleTime: 5 * 60 * 1000 }
   );
+  const { data: featuredMenusData, isLoading: loadingFeatured } = useApiCache<any[]>(
+    'featured-menus',
+    '/menus/featured',
+    { staleTime: 5 * 60 * 1000 }
+  );
 
-  const isLoading = loadingCats || loadingMenus || loadingBanners;
+  const isLoading = loadingCats || loadingMenus || loadingBanners || loadingFeatured;
 
   const categories = categoriesData ?? [];
-  const popularMenu = useMemo(() => (menusData ?? []).slice(0, 4), [menusData]);
+  const popularMenu = useMemo(() => (featuredMenusData ?? []).slice(0, 4), [featuredMenusData]);
 
   const defaultBanners = [
     { id: 'def1', title: 'Buy 1 Get 1 Free', subtitle: 'Semua minuman coffee', tag: 'Promo Hari Ini', type: 'gradient', gradient_start: '#6367FF', gradient_end: '#8B5CF6' },
