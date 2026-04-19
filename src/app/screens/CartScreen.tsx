@@ -71,8 +71,12 @@ export function CartScreen() {
     const itemPrice = item.variant?.price ?? item.menu?.price ?? 0;
     return sum + (Number(itemPrice) * item.quantity);
   }, 0);
-  const deliveryFee = 0; // Free for now as it's a cafe
-  const discount = 0;
+
+  const today = new Date().toLocaleDateString('en-CA');
+  const isSoftOpening = today >= '2026-04-19' && today <= '2026-04-24';
+
+  const discount = isSoftOpening ? Math.round(subtotal * 0.25) : 0;
+  const deliveryFee = 0;
   const total = subtotal + deliveryFee - discount;
 
   const removeItem = async (id: number) => {
@@ -385,7 +389,10 @@ export function CartScreen() {
                 )}
                 {discount > 0 && (
                   <div className="flex justify-between text-[#6367FF] text-sm">
-                    <span>Diskon</span>
+                    <span className="flex items-center gap-2">
+                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                       Diskon Soft Opening 25%
+                    </span>
                     <span>- Rp {discount.toLocaleString("id-ID")}</span>
                   </div>
                 )}

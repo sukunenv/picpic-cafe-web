@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { User, LogOut, History, ChevronRight, Settings, Info, CreditCard, ExternalLink, Star } from "lucide-react";
+import { User, LogOut, History, ChevronRight, Settings, Info, CreditCard, ExternalLink, Star, Printer } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import api from "../../lib/api";
 import { MemberCard } from "../components/MemberCard";
+import { ReceiptModal } from "../components/ReceiptModal";
 
 const logo = "/logo.png";
 
@@ -15,6 +16,8 @@ export function ProfileScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [tierSettings, setTierSettings] = useState<any>(null);
   const [showAllOrders, setShowAllOrders] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [showReceipt, setShowReceipt] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -237,13 +240,25 @@ export function ProfileScreen() {
                         {order.status}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-[#2D2B55]/40 text-[10px] font-bold uppercase tracking-widest">{order.order_items?.length || 0} item dipesan</span>
                       <span className="text-[#2D2B55] font-black text-sm tracking-tight">
                         Rp {Number(order.total).toLocaleString("id-ID")}
                       </span>
                     </div>
-                  </div>
+                    
+                    {/* Cetak Struk Button - ISSUE 2 */}
+                    <div className="mt-3 pt-3 border-t border-gray-50 flex justify-end">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedOrder(order);
+                          setShowReceipt(true);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#6367FF]/5 text-[#6367FF] rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[#6367FF] hover:text-white transition-all"
+                      >
+                        <Printer size={12} />
+                        Cetak Struk
+                      </button>
+                    </div>
                 </motion.div>
               ))}
               {/* Tombol Lihat Semua / Sembunyikan */}
@@ -345,6 +360,38 @@ export function ProfileScreen() {
           <p className="text-[#2D2B55]/20 text-[10px] font-black tracking-widest mt-1 uppercase">Version 3.1.0 Premium</p>
         </motion.div>
       </motion.div>
+
+      {/* Receipt Modal - ISSUE 2 */}
+      {selectedOrder && (
+        <ReceiptModal
+          isOpen={showReceipt}
+          onClose={() => setShowReceipt(false)}
+          data={{
+            order_number: selectedOrder.order_number,
+            customer_name: userData?.name || "Member",
+            table_number: selectedOrder.table_number || "-",
+            items: selectedOrder.order_items?.map((item: any) => ({
+              name: item.menu?.name || "Menu",
+              quantity: item.quantity,
+              price: item.price,
+              type: item.menu?.category?.type || "food"
+            })) || [],
+            subtotal: selectedOrder.subtotal,
+            discount: selectedOrder.discount_amount,
+            total: selectedOrder.total,
+            method: selectedOrder.payment_method?.toUpperCase() || "PAYMENT",
+            change: 0,
+            date: new Date(selectedOrder.created_at).toLocaleString('id-ID', { 
+              weekday: 'long', 
+              day: 'numeric', 
+              month: 'short', 
+              year: 'numeric', 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            }) + ' WIB'
+          }}
+        />
+      )}
     </div>
   );
 }
