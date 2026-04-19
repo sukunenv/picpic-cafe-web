@@ -371,7 +371,7 @@ export function ProfileScreen() {
             customer_name: userData?.name || "Member",
             table_number: selectedOrder.table_number || "-",
             items: selectedOrder.order_items?.map((item: any) => ({
-              name: item.menu?.name || "Menu",
+              name: item.variant?.name ? `${item.menu?.name} - ${item.variant.name}` : (item.menu?.name || "Menu"),
               quantity: item.quantity,
               price: item.price,
               type: item.menu?.category?.type || "food"
