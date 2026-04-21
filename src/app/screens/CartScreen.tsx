@@ -23,6 +23,7 @@ export function CartScreen() {
   const [userData, setUserData] = useState<any>(null);
   const [tableNumber, setTableNumber] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
+  const [itemNotes, setItemNotes] = useState<Record<number, string>>({});
 
   useEffect(() => {
     fetchCart();
@@ -58,6 +59,7 @@ export function CartScreen() {
       setIsLoading(true);
       const res = await api.get('/cart');
       setCartItems(res.data);
+      setItemNotes(Object.fromEntries(res.data.map((item: any) => [item.id, item.notes || ""])));
     } catch (err) {
       console.error("Error fetching cart API, fallback to localStorage:", err);
       const localCart = JSON.parse(localStorage.getItem('picpic_cart') || '[]');
@@ -88,6 +90,15 @@ export function CartScreen() {
       const newLocalCart = cartItems.filter((item) => item.id !== id);
       setCartItems(newLocalCart);
       localStorage.setItem('picpic_cart', JSON.stringify(newLocalCart));
+    }
+  };
+
+  const handleUpdateItemNotes = async (cartId: number) => {
+    const newNotes = itemNotes[cartId]?.trim() || null;
+    try {
+      await api.put(`/cart/${cartId}`, { notes: newNotes });
+    } catch (err) {
+      console.error("Gagal update notes item:", err);
     }
   };
 
@@ -212,6 +223,14 @@ export function CartScreen() {
                       <span className="text-[#2D2B55] font-black text-[10px] bg-[#F8F7FF] px-3 py-1.5 rounded-full uppercase tracking-widest">
                         {item.quantity}x Pesanan
                       </span>
+                      <input
+                        type="text"
+                        placeholder="Catatan item... (opsional)"
+                        value={itemNotes[item.id] ?? ""}
+                        onChange={(e) => setItemNotes({ ...itemNotes, [item.id]: e.target.value })}
+                        onBlur={() => handleUpdateItemNotes(item.id)}
+                        className="w-full mt-2 px-3 py-2 bg-[#F8F7FF] rounded-xl text-[#2D2B55] text-xs font-medium placeholder:text-[#2D2B55]/25 border border-[#2D2B55]/5 focus:outline-none focus:border-[#6367FF] transition-all"
+                      />
                     </div>
                     <button
                       onClick={() => removeItem(item.id)}

@@ -81,6 +81,9 @@ export function ReceiptModal({ isOpen, onClose, data }: ReceiptModalProps) {
                   {data.items.map((item, i) => (
                     <div key={i}>
                       <p className="font-bold text-[#2D2B55] uppercase">{item.name}</p>
+                      {item.notes && (
+                        <p className="text-[10px] italic text-gray-500 mt-0.5">Catatan: {item.notes}</p>
+                      )}
                       <div className="flex justify-between">
                         <span>{item.quantity} x {Number(item.price).toLocaleString('id-ID')}</span>
                         <span>{(item.quantity * item.price).toLocaleString('id-ID')}</span>

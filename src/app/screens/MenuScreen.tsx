@@ -65,6 +65,7 @@ export function MenuScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [toast, setToast] = useState<{ show: boolean, message: string, image?: string }>({ show: false, message: "" });
   const [variantModal, setVariantModal] = useState<{ open: boolean; menu: any | null }>({ open: false, menu: null });
+  const [itemNote, setItemNote] = useState("");
 
   const showFeedback = (item: any) => {
     setToast({ show: true, message: item.name, image: item.image });
@@ -85,10 +86,12 @@ export function MenuScreen() {
       quantity: 1,
       image: menu.image,
       variant_name: variant?.name ?? null,
+      notes: itemNote.trim() || null,
     };
 
     try {
       await api.post('/cart', payload);
+      setItemNote("");
       showFeedback(menu);
     } catch (err) {
       console.error("Gagal addToCart via API:", err);
@@ -272,8 +275,10 @@ export function MenuScreen() {
                             e.preventDefault();
                             e.stopPropagation();
                             if (item.variants && item.variants.length > 0) {
+                              setItemNote("");
                               setVariantModal({ open: true, menu: item });
                             } else {
+                              setItemNote("");
                               handleAddToCart(e, item, null);
                             }
                           }}
@@ -365,11 +370,23 @@ export function MenuScreen() {
                     </button>
                   ))}
                 </div>
+
+                {/* Notes Input */}
+                <div className="mt-4 px-1">
+                  <input
+                    type="text"
+                    placeholder="Catatan item... (opsional)"
+                    value={itemNote}
+                    onChange={(e) => setItemNote(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full px-4 py-3 bg-gray-50 rounded-2xl text-[#2D2B55] text-sm font-medium placeholder:text-gray-300 border border-gray-100 focus:outline-none focus:border-[#6367FF] transition-all"
+                  />
+                </div>
               </div>
 
               <div className="p-4 border-t border-gray-100 bg-white">
                 <button
-                  onClick={() => setVariantModal({ open: false, menu: null })}
+                  onClick={() => { setItemNote(""); setVariantModal({ open: false, menu: null }); }}
                   className="w-full py-3 border-2 border-gray-200 text-gray-400 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-gray-50 transition-all"
                 >
                   Batal

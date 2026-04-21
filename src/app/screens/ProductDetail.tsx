@@ -12,6 +12,7 @@ export function ProductDetail() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<any | null>(null);
+  const [notes, setNotes] = useState("");
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('id-ID', {
@@ -52,6 +53,7 @@ export function ProductDetail() {
       quantity: quantity,
       image: product.image,
       variant_name: selectedVariant?.name ?? null,
+      notes: notes.trim() || null,
     };
 
     try {
@@ -76,6 +78,7 @@ export function ProductDetail() {
       }
       localStorage.setItem('picpic_cart', JSON.stringify(existingCart));
     } finally {
+      setNotes("");
       navigate("/cart");
     }
   };
@@ -269,6 +272,18 @@ export function ProductDetail() {
                   <span className="text-[10px] font-black uppercase opacity-30">Suhu</span>
                     <span className="text-[#2D2B55] font-black text-xs tracking-tight">Panas / Dingin</span>
                 </div>
+              </div>
+
+              {/* Notes Input */}
+              <div>
+                <h3 className="text-[#2D2B55] font-black text-[10px] mb-2 uppercase tracking-[0.2em] opacity-30">Catatan</h3>
+                <input
+                  type="text"
+                  placeholder="Contoh: less sugar, extra shot, dll. (opsional)"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="w-full px-4 py-3 bg-[#F8F7FF] rounded-2xl text-[#2D2B55] text-sm font-medium placeholder:text-[#2D2B55]/25 border border-[#2D2B55]/5 focus:outline-none focus:border-[#6367FF] transition-all"
+                />
               </div>
             </div>
           </div>
