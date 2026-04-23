@@ -21,6 +21,15 @@ export function ProductDetail() {
       minimumFractionDigits: 0,
     }).format(price)
 
+  const getDiscountedPrice = (price: number, promo: any) => {
+    if (!promo) return price;
+    if (promo.type === 'percent') {
+      return price * (1 - promo.value / 100);
+    } else {
+      return Math.max(0, price - promo.value);
+    }
+  };
+
   const [product, setProduct] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -180,6 +189,11 @@ export function ProductDetail() {
               <span className="px-3 py-1 bg-[#6367FF]/10 text-[#6367FF] text-[10px] font-black uppercase tracking-widest rounded-full">
                 {product.category?.name || "Premium Cafe"}
               </span>
+              {product.promo && (
+                <span className="px-3 py-1 bg-orange-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-orange-500/20">
+                  {product.promo.name}
+                </span>
+              )}
               <div className="flex items-center gap-1 ml-auto">
                 <Star size={14} className="text-[#FFB800] fill-[#FFB800]" />
                 <span className="text-[#2D2B55] font-bold text-xs">{product.rating || "4.8"}</span>
@@ -190,12 +204,22 @@ export function ProductDetail() {
               {product.name}
             </h1>
             
-            <p className="text-[#6367FF] font-black text-2xl mb-6 flex items-center">
-              {!selectedVariant && product.variants && product.variants.length > 0 && (
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-2">Mulai dari</span>
+            <div className="mb-6">
+              {product.promo && (
+                <p className="text-[12px] text-gray-400 line-through leading-none mb-1">
+                  {!selectedVariant && product.variants && product.variants.length > 0 && (
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-2">Mulai</span>
+                  )}
+                  {formatPrice(selectedVariant ? selectedVariant.price : (product.variants && product.variants.length > 0 ? Math.min(...product.variants.map((v: any) => v.price)) : Number(product.price)))}
+                </p>
               )}
-              {formatPrice(selectedVariant ? selectedVariant.price : (product.variants && product.variants.length > 0 ? Math.min(...product.variants.map((v: any) => v.price)) : Number(product.price)))}
-            </p>
+              <p className="text-[#6367FF] font-black text-2xl flex items-center">
+                {!selectedVariant && product.variants && product.variants.length > 0 && (
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-2">Mulai dari</span>
+                )}
+                {formatPrice(getDiscountedPrice(selectedVariant ? selectedVariant.price : (product.variants && product.variants.length > 0 ? Math.min(...product.variants.map((v: any) => v.price)) : Number(product.price)), product.promo))}
+              </p>
+            </div>
 
             {/* INLINE VARIANT SELECTION */}
             {product.variants && product.variants.length > 0 && (
@@ -215,9 +239,16 @@ export function ProductDetail() {
                       <span className={`font-bold text-sm ${selectedVariant?.id === variant.id ? 'text-[#6367FF]' : 'text-[#2D2B55]'}`}>
                         {variant.name}
                       </span>
-                      <span className={`font-black text-sm ${selectedVariant?.id === variant.id ? 'text-[#6367FF]' : 'text-gray-500'}`}>
-                        {formatPrice(Number(variant.price))}
-                      </span>
+                      <div className="text-right">
+                        {product.promo && (
+                          <p className="text-[10px] text-gray-400 line-through leading-none mb-0.5">
+                            {formatPrice(Number(variant.price))}
+                          </p>
+                        )}
+                        <span className={`font-black text-sm ${selectedVariant?.id === variant.id ? 'text-[#6367FF]' : 'text-gray-500'}`}>
+                          {formatPrice(getDiscountedPrice(Number(variant.price), product.promo))}
+                        </span>
+                      </div>
                     </button>
                   ))}
                 </div>

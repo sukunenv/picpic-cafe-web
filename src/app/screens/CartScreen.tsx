@@ -74,8 +74,10 @@ export function CartScreen() {
     return sum + (Number(itemPrice) * item.quantity);
   }, 0);
 
-  const today = new Date().toLocaleDateString('en-CA');
-  const isSoftOpening = today >= '2026-04-19' && today <= '2026-04-24';
+  // OLD HARDCODED LOGIC - DISABLED
+  // const today = new Date().toLocaleDateString('en-CA');
+  // const isSoftOpening = today >= '2026-04-19' && today <= '2026-04-24';
+  const isSoftOpening = false;
 
   const discount = isSoftOpening ? Math.round(subtotal * 0.25) : 0;
   const deliveryFee = 0;
@@ -571,6 +573,15 @@ export function CartScreen() {
                     <p className="text-[#2D2B55]/40 text-[10px] uppercase font-black tracking-widest mb-1.5">No. Order</p>
                     <p className="text-[#2D2B55] font-black text-lg tracking-tight">{lastOrder?.order_number || 'ORD-000000'}</p>
                   </div>
+                  {lastOrder?.discount_amount > 0 && (
+                    <div className="mb-4">
+                      <p className="text-[#2D2B55]/40 text-[10px] uppercase font-black tracking-widest mb-1">Potongan Harga</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-green-600 font-bold text-sm italic">Disc {lastOrder.discount_name}</span>
+                        <span className="text-green-600 font-black text-sm">-Rp {Number(lastOrder.discount_amount).toLocaleString("id-ID")}</span>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex justify-between items-end border-t border-[#F8F7FF] pt-5">
                     <div>
                       <p className="text-[#2D2B55]/40 text-[10px] uppercase font-black tracking-widest mb-1">Metode Bayar</p>

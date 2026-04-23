@@ -13,6 +13,19 @@ function toTitleCase(str: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function formatPrice(price: number) {
+  return "Rp " + Number(price).toLocaleString("id-ID");
+}
+
+function getDiscountedPrice(price: number, promo: any) {
+  if (!promo) return price;
+  if (promo.type === 'percent') {
+    return price * (1 - promo.value / 100);
+  } else {
+    return Math.max(0, price - promo.value);
+  }
+}
+
 /* ─── Shimmer Skeleton Card ─────────────────────────────── */
 function SkeletonCard() {
   return (
@@ -249,6 +262,13 @@ export function MenuScreen() {
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
+                      {item.promo && (
+                        <div className="absolute top-2 left-2 z-10">
+                          <span className="bg-orange-500 text-white text-[8px] font-black px-2 py-1 rounded-lg shadow-lg uppercase tracking-widest">
+                            {item.promo.name}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Text Contents */}
@@ -262,12 +282,23 @@ export function MenuScreen() {
                       </p>
 
                       <div className="mt-auto flex justify-between items-end">
-                        <p className="text-[#6367FF] font-black text-sm tracking-tighter flex items-center">
-                          {item.variants && item.variants.length > 0 && (
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-1">Mulai dari</span>
+                        <div className="flex flex-col">
+                          {item.promo && (
+                            <p className="text-[10px] text-gray-400 line-through leading-none mb-0.5">
+                              {item.variants && item.variants.length > 0 ? (
+                                formatPrice(Math.min(...item.variants.map((v: any) => v.price)))
+                              ) : formatPrice(Number(item.price))}
+                            </p>
                           )}
-                          Rp {(item.variants && item.variants.length > 0 ? Math.min(...item.variants.map((v: any) => v.price)) : Number(item.price)).toLocaleString("id-ID")}
-                        </p>
+                          <p className="text-[#6367FF] font-black text-sm tracking-tighter flex items-center">
+                            {item.variants && item.variants.length > 0 && (
+                              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-1">Mulai dari</span>
+                            )}
+                            {item.variants && item.variants.length > 0 ? (
+                              formatPrice(getDiscountedPrice(Math.min(...item.variants.map((v: any) => v.price)), item.promo))
+                            ) : formatPrice(getDiscountedPrice(Number(item.price), item.promo))}
+                          </p>
+                        </div>
 
                         {/* 3. Tombol "+" (Add to Cart) */}
                         <button 
@@ -364,9 +395,16 @@ export function MenuScreen() {
                       <span className="font-bold text-sm text-[#2D2B55] group-hover:text-[#6367FF]">
                         {variant.name}
                       </span>
-                      <span className="font-black text-sm text-[#6367FF]">
-                        Rp {Number(variant.price).toLocaleString('id-ID')}
-                      </span>
+                      <div className="text-right">
+                        {variantModal.menu?.promo && (
+                          <p className="text-[10px] text-gray-400 line-through leading-none mb-0.5">
+                            {formatPrice(variant.price)}
+                          </p>
+                        )}
+                        <span className="font-black text-sm text-[#6367FF]">
+                          {formatPrice(getDiscountedPrice(variant.price, variantModal.menu?.promo))}
+                        </span>
+                      </div>
                     </button>
                   ))}
                 </div>
